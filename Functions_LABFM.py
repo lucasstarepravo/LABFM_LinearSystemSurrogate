@@ -144,7 +144,16 @@ def calc_monomial(nodes, m):
     return monomials
 
 
-def calc_HABF():
+def calc_HermP():  # Needs to be written
+
+    return
+
+
+def calc_WLC2RBF():
+    return
+
+
+def calc_HABF():  # Needs to be written
     return
 
 
