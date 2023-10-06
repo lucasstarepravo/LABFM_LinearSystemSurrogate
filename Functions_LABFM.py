@@ -99,7 +99,9 @@ def neighbour_nodes(distance, h):
             for dis_x,dis_y in distance[i]:
                 r_distance = (dis_x**2+dis_y**2)**.5
                 if r_distance <= 2 * h:
-                    # add here a way to pop the items out of the distance list, the items that
+                    # I can add here a way to pop the items out of the distance list, the items that are out of bounds.
+                    # This would make the neighbour dictionary in cartesian coordinates only to contain nodes that will
+                    # be reference nodes
                     neighbours_radius[index].append(r_distance)
                     neighbours_cartesian[index].append([dis_x,dis_y])
             index = index + 1
@@ -112,10 +114,20 @@ def monomial_power(polynomial):
     :param polynomial:
     :return:
     """
-    monomials = [(total_polynomial - i, i)
+    monomial_exponent = [(total_polynomial - i, i)
                  for total_polynomial in range(1, polynomial + 1)
                  for i in range(total_polynomial + 1)]
-    return np.array(monomials)
+    return np.array(monomial_exponent)
+
+
+def calc_scaling_matrix(monomial_exponent, h):
+    scaling_m = np.zeros((len(monomial_exponent), 1))
+    index = 0
+    for exp_x, exp_y in monomial_exponent:
+        exp_h = exp_x + exp_y
+        scaling_m[index] = h**exp_h
+        index = index + 1
+    return scaling_m
 
 
 def calc_monomial(nodes, m):
