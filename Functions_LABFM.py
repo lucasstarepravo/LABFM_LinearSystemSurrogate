@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 
 def create_nodes(total_nodes, s):
@@ -120,7 +121,14 @@ def monomial_power(polynomial):
     return np.array(monomial_exponent)
 
 
+#Scaling matrix still hasn't been applied to the monomial or to the Cd vector
 def calc_scaling_matrix(monomial_exponent, h):
+    '''
+
+    :param monomial_exponent:
+    :param h:
+    :return:
+    '''
     scaling_m = np.zeros((len(monomial_exponent), 1))
     index = 0
     for exp_x, exp_y in monomial_exponent:
@@ -156,16 +164,76 @@ def calc_monomial(nodes, m):
     return monomials
 
 
-def calc_HermP():  # Needs to be written
+def calc_hp_n2(exp_a, coordinates, h):  # Needs to be written
+    '''
+    The general form of the Hermite polynomial contains a derivative operator, where the order of the operator depends
+    on the polynomial order of the simulation. Thus, this equation only works for n = 2
+    :param exp_a:
+    :param coordinates:
+    :param h:
+    :return:
+    '''
+    z = coordinates/(h*(2**.5))
+    h = (-1)**exp_a * (4*z - 2)
+    return h
 
+
+def calc_hp_n5(exp_a, coordinates, h):  # Needs to be written
+    '''
+    The general form of the Hermite polynomial contains a derivative operator, where the order of the operator depends
+    on the polynomial order of the simulation. Thus, this equation only works for n = 5
+    :param exp_a:
+    :param coordinates:
+    :param h:
+    :return:
+    '''
+    z = coordinates/(h*(2**.5))
+    h = (-1)**exp_a * (-32*z**5 + 160*z**3 - 120*z)
+    return h
+
+
+def gaussian_rbf(neighbours_r, h):
+    '''
+
+    :param neighbours_r:
+    :param h:
+    :return:
+    '''
+
+    q = neighbours_r/ h
+
+    w_ji = 9/math.pi*math.exp(-9*(q**2))
+
+    return w_ji
+
+
+def calc_lwc2wbf():
     return
 
 
-def calc_WLC2RBF():
-    return
+def calc_abf(nodes, h, polynomial):  # Needs to be written
+    '''
+
+    :param nodes:
+    :param h:
+    :param polynomial:
+    :return:
+    '''
+    neigh_r = nodes.neighbours_r
+    basis_func = {}
+    index = 0
+
+    for i in neigh_r:
+        if neigh_r[i] is None:
+            continue
+        else:
+            for j in neigh_r[i]:
+                basis_func[index] = []
 
 
-def calc_HABF():  # Needs to be written
+
+
+
     return
 
 
