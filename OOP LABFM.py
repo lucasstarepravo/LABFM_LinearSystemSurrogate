@@ -5,6 +5,7 @@ from Functions_LABFM import threshold
 from Functions_LABFM import dist_nodes
 from Functions_LABFM import calc_monomial
 from Functions_LABFM import calc_abf
+from Functions_LABFM import calc_m
 
 
 '''Simulation over a unit plane'''
@@ -12,11 +13,11 @@ from Functions_LABFM import calc_abf
 
 class Simulation:
     def __init__(self, total_nodes, s):
-        self.total_nodes = total_nodes
-        self.s           = s
-        self.polynomial  = 1  # Order of approximation that will be used in monomial
-        self.h           = calc_h(self.s, self.total_nodes)
-        self.nodes       = Nodes(self.total_nodes, self.s, self.h)
+        self.total_nodes       = total_nodes
+        self.s                 = s
+        self.polynomial        = 2  # Order of approximation that will be used in monomial
+        self.h                 = calc_h(self.s, self.total_nodes)
+        self.nodes             = Nodes(self.total_nodes, self.s, self.h)
         self.discrete_operator = DiscreteOperator(self.nodes, self.polynomial, self.h)
 
 
@@ -31,8 +32,8 @@ class Nodes:
 class DiscreteOperator:
     def __init__(self, nodes, polynomial, h):
         self.monomial = calc_monomial(nodes, polynomial)
-        self.ABF      = calc_abf(nodes, h, polynomial)
-        #self.M = calc_M(nodes) # Still need to be written
+        self.ABF      = calc_abf(nodes, h, polynomial) # When calculating the weights, should radius be magnitude or have a direction?
+        #self.M        = calc_m(nodes)
 
 
 
