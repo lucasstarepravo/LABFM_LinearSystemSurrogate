@@ -119,8 +119,12 @@ def monomial_power(polynomial):
     return np.array(monomial_exponent)
 
 
-# Scaling matrix still hasn't been applied to the monomial or to the Cd vector
-def calc_scaling_matrix(monomial_exponent, h):
+def pointing_v():
+    return
+
+
+# Scaling matrix still hasn't been applied to the Cd vector
+def scaling_matrix(monomial_exponent, h):
     """
 
     :param monomial_exponent:
@@ -130,13 +134,13 @@ def calc_scaling_matrix(monomial_exponent, h):
     scaling_m = np.zeros((len(monomial_exponent), 1))
     index = 0
     for exp_x, exp_y in monomial_exponent:
-        exp_h = exp_x + exp_y
+        exp_h = -(exp_x + exp_y)
         scaling_m[index] = h ** exp_h
         index = index + 1
     return scaling_m
 
 
-def calc_monomial(nodes, m):
+def calc_monomial(nodes, m, h):
     """
 
     :param nodes:
@@ -159,6 +163,13 @@ def calc_monomial(nodes, m):
                                                            np.array(neighbours[i])[:, 1] ** power_y
                 index = index + 1
             monomial_dict_index = monomial_dict_index + 1
+
+    scaling_v = scaling_matrix(m_power, h).reshape(-1,1)
+
+    for key in monomials:
+        for row in range(len(monomials[key])):
+            monomials[key][row, :] = monomials[key][row, :] * scaling_v.T
+
     return monomials
 
 
@@ -238,23 +249,20 @@ def calc_abf(nodes, h, m):  # Needs to be written
     return basis_func
 
 
-def calc_m(nodes):
+def calc_m(basis_func, monomial):
     """
-    This function calculates the monomial vector only for the x_ji and y_ji
+
     :param nodes:
     :return:
     """
 
-    neighbours_r = nodes.neighbours_r
-    neighbours_xy = nodes.neighbours_xy
+    index = 0
+    m = {}
 
-    M_tensor = np.zeros(())
+    for i in basis_func:
+        m[index] = np.zeros((basis_func[i].shape[1], monomial[i].shape[1]))
+        for j in range(len(basis_func[index])):
+            m[index] = m[index] + np.outer(monomial[i][j], basis_func[i][j])
+        index = index + 1
 
-    for i in range(len(neighbours_xy)):
-        if neighbours_xy[i] is None:
-            pass
-        else:
-
-            monomial = np.zeros((neighbours_xy[i], 2))
-
-    return
+    return m

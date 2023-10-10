@@ -31,9 +31,9 @@ class Nodes:
 
 class DiscreteOperator:
     def __init__(self, nodes, polynomial, h):
-        self.monomial = calc_monomial(nodes, polynomial)
+        self.monomial = calc_monomial(nodes, polynomial, h)
         self.ABF      = calc_abf(nodes, h, polynomial) # When calculating the weights, should radius be magnitude or have a direction?
-        #self.M        = calc_m(nodes)
+        self.M        = calc_m(self.ABF, self.monomial)
 
 
 
