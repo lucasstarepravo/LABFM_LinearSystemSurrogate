@@ -219,20 +219,20 @@ def calc_abf(nodes, h, m):  # Needs to be written
     basis_func = {}
     index = 0
     m_power = monomial_power(m)
+    n = len(m_power)
 
     for i in neigh_r:
         if neigh_r[i] is None:
             continue
         else:
+            basis_func[index] = np.zeros((len(neigh_r[i]), n))
             for j in range(len(neigh_r[i])):
-                basis_func[index] = []
-                to_append = []
-                for k in range(len(m_power)):
-                    to_append.append(gaussian_rbf(neigh_r[i][j], h) / (2 ** (m_power[k, 0] + m_power[k, 1])) ** .5 * \
-                                     calc_hp(m_power[k, 0], neigh_xy[i][j][0], h, m) * \
-                                     calc_hp(m_power[k, 1], neigh_xy[i][j][1], h, m))
-
-                basis_func[index].append(to_append)
+                w_jid = []
+                for k in range(n):
+                    w_jid.append(gaussian_rbf(neigh_r[i][j], h) / (2 ** (m_power[k, 0] + m_power[k, 1])) ** .5 * \
+                                 calc_hp(m_power[k, 0], neigh_xy[i][j][0], h, m) * \
+                                 calc_hp(m_power[k, 1], neigh_xy[i][j][1], h, m))
+                basis_func[index][j, :] = np.array(w_jid)
             index = index + 1
 
     return basis_func
