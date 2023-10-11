@@ -1,3 +1,4 @@
+from Sim_Functions import calc_h
 import numpy as np
 import math
 
@@ -39,16 +40,12 @@ def threshold(coordinates):  # check whether the node is inside or outside the d
     return in_domain
 
 
-def calc_h(s, total_nodes):
-    """FOR NOW THIS WILL BE LEFT 0.1 for now"""
-    h = 0.1  # s*()
-    return h
-
-
 def dist_nodes(coordinates, in_domain):
     """
 
-    :param coordinates: :param in_domain: :return: distance(dict): For points that are outside the domain (Boundary
+    :param coordinates:
+    :param in_domain:
+    :return: distance(dict): For points that are outside the domain (Boundary
     points), the value of the key will be None. Since we don't need to calculate the distance of nodes outside the
     boundary to every other node. For nodes within the domain, for each key, there will be a list, each value of the
     list, is another list with 2 items. The first item is the x distance from the reference point, the second item is
@@ -105,184 +102,3 @@ def neighbour_nodes(distance, h):
                     neighbours_cartesian[index].append([dis_x, dis_y])
             index = index + 1
     return neighbours_radius, neighbours_cartesian
-
-
-def monomial_power(polynomial):
-    """
-
-    :param polynomial:
-    :return:
-    """
-    monomial_exponent = [(total_polynomial - i, i)
-                         for total_polynomial in range(1, polynomial + 1)
-                         for i in range(total_polynomial + 1)]
-    return np.array(monomial_exponent)
-
-
-def pointing_v(m, approximation):
-    """
-
-    :param m:
-    :param approximation:
-    :return:
-    """
-    n = (m**2 + 3*m)/2
-    cd = np.zeros((n,1))
-    if approximation == 'x':
-        cd[0] = 1
-    elif approximation == 'y':
-        cd[1] = 1
-    elif approximation == 'Laplace':
-        cd[2] = 2
-        cd[4] = 4
-    return cd
-
-
-# Scaling matrix still hasn't been applied to the Cd vector
-def scaling_matrix(monomial_exponent, h):
-    """
-
-    :param monomial_exponent:
-    :param h:
-    :return:
-    """
-    scaling_m = np.zeros((len(monomial_exponent), 1))
-    index = 0
-    for exp_x, exp_y in monomial_exponent:
-        exp_h = -(exp_x + exp_y)
-        scaling_m[index] = h ** exp_h
-        index = index + 1
-    return scaling_m
-
-
-def calc_monomial(nodes, m, h):
-    """
-
-    :param nodes:
-    :param m:
-    :return:
-    """
-    neighbours = nodes.neighbours_xy
-    monomials = {}
-    monomial_dict_index = 0
-    m_power = monomial_power(m)
-
-    for i in range(len(neighbours)):
-        if neighbours[i] is None:
-            continue
-        else:
-            index = 0
-            monomials[monomial_dict_index] = np.zeros((len(neighbours[i]), len(m_power)))
-            for power_x, power_y in m_power:
-                monomials[monomial_dict_index][:, index] = np.array(neighbours[i])[:, 0] ** power_x * \
-                                                           np.array(neighbours[i])[:, 1] ** power_y
-                index = index + 1
-            monomial_dict_index = monomial_dict_index + 1
-
-    scaling_v = scaling_matrix(m_power, h).reshape(-1,1)
-
-    for key in monomials:
-        for row in range(len(monomials[key])):
-            monomials[key][row, :] = monomials[key][row, :] * scaling_v.T
-
-    return monomials
-
-
-def calc_hp(exp_a, coordinates, h, m):
-    """
-
-    :param exp_a:
-    :param coordinates:
-    :param h:
-    :param m:
-    :return:
-    """
-
-    z = coordinates / (h * (2 ** .5))
-
-    if m == 1:  # # This equation only works for n = 2 (i.e. m = 1)
-        h = (-1) ** exp_a * (4 * z - 2)
-
-    elif m == 2:  # This equation only works for n = 5 (i.e. m = 2)
-        h = (-1) ** exp_a * (-32 * z ** 5 + 160 * z ** 3 - 120 * z)
-
-    else:
-        raise ValueError("Invalid value for m. m must be a polynomial that can be handled by the simulation. Try "
-                         "lowering the value of m")
-
-    return h
-
-
-def gaussian_rbf(neighbours_r, h):
-    """
-
-    :param neighbours_r:
-    :param h:
-    :return:
-    """
-
-    q = neighbours_r / h
-
-    w_ji = 9 / math.pi * math.exp(-9 * (q ** 2))
-
-    return w_ji
-
-
-def calc_lwc2wbf():
-    return
-
-
-def calc_abf(nodes, h, m):  # Needs to be written
-    """
-
-    :param nodes:
-    :param h:
-    :param m: is the order of the high order polynomial we chose to approximate
-    :return:
-    """
-    neigh_r = nodes.neighbours_r
-    neigh_xy = nodes.neighbours_xy
-    basis_func = {}
-    index = 0
-    m_power = monomial_power(m)
-    n = len(m_power)
-
-    for i in neigh_r:
-        if neigh_r[i] is None:
-            continue
-        else:
-            basis_func[index] = np.zeros((len(neigh_r[i]), n))
-            for j in range(len(neigh_r[i])):
-                w_jid = []
-                for k in range(n):
-                    w_jid.append(gaussian_rbf(neigh_r[i][j], h) / (2 ** (m_power[k, 0] + m_power[k, 1])) ** .5 * \
-                                 calc_hp(m_power[k, 0], neigh_xy[i][j][0], h, m) * \
-                                 calc_hp(m_power[k, 1], neigh_xy[i][j][1], h, m))
-                basis_func[index][j, :] = np.array(w_jid)
-            index = index + 1
-
-    return basis_func
-
-
-def calc_m(basis_func, monomial):
-    """
-
-    :param monomial:
-    :param basis_func:
-    :return:
-    """
-
-    index = 0
-    m = {}
-
-    for i in basis_func:
-        m[index] = np.zeros((basis_func[i].shape[1], monomial[i].shape[1]))
-        for j in range(len(basis_func[index])):
-            m[index] = m[index] + np.outer(monomial[i][j], basis_func[i][j])
-        index = index + 1
-
-    return m
-
-
-def solve_weights(m, cd):
-    return
