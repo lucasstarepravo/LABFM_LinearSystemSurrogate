@@ -98,13 +98,16 @@ def calc_hp(exp_a, coordinates, h):
         h = 64 * z ** 6 - 480 * z ** 4 + 720 * z ** 2 - 120
 
     elif exp_a == 7:
-        h = 128 * z ** 7 - 1344 * z ** 5 + 3360 * z -1680 * z
+        h = 128 * z ** 7 - 1344 * z ** 5 + 3360 * z ** 3 - 1680 * z
 
     elif exp_a == 8:
+        h = 256 * z ** 8 - 3584 * z ** 6 + 13440 * z ** 4 - 13440 * z ** 2 + 1680
 
     elif exp_a == 9:
+        h = 512 * z ** 9 - 9216 * z ** 7 + 48384 * z ** 5 - 80640 * z ** 3 + 30240 * z
 
     elif exp_a == 10:
+        h = 1024 * z ** 10 - 23040 * z ** 8 + 161280 * z ** 6 - 403200 * z ** 4 + 302400 * z ** 2 - 30240
 
     else:
         raise ValueError("Invalid value for polynomial. The polynomial must be a polynomial that can be handled by "

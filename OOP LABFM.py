@@ -37,4 +37,8 @@ class DiscreteOperator:
         self.M = calc_m(self.ABF, self.monomial)
 
 
-sim = Simulation(100, 0.01)
+sim = Simulation(1000, 0.01)
+
+# To check matrix condition
+# import numpy as np
+# np.linalg.cond(sim.discrete_operator.M[0])
