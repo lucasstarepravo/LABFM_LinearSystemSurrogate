@@ -1,12 +1,7 @@
-from Sim_Functions import calc_h
-from Nodes_Functions import create_nodes
-from Nodes_Functions import neighbour_nodes
-from Nodes_Functions import threshold
-from Nodes_Functions import dist_nodes
-from DO_Functions import calc_monomial
-from DO_Functions import calc_abf
-from DO_Functions import calc_m
-import matplotlib as plt
+from Nodes_Functions import *
+from DO_Functions import *
+from Sim_Functions import *
+from Plot_Functions import *
 
 '''Simulation over a unit plane'''
 
@@ -19,6 +14,7 @@ class Simulation:
         self.h = calc_h(self.s, self.total_nodes)
         self.nodes = Nodes(self.total_nodes, self.s, self.h)
         self.discrete_operator = DiscreteOperator(self.nodes, self.polynomial, self.h)
+        self.plot = Plot(self.nodes, self.h)
 
 
 class Nodes:
@@ -37,7 +33,27 @@ class DiscreteOperator:
         self.M = calc_m(self.ABF, self.monomial)
 
 
-sim = Simulation(1000, 0.01)
+class Plot:
+    def __init__(self, nodes, h):
+        self._nodes = nodes
+        self._h = h
+        self._domain = None
+        self._neighbours = None
+
+    @property
+    def domain(self):
+        if self._domain is None:
+            self._domain = plot_nodes(self._nodes)
+        return self._domain
+
+    @property
+    def neighbours(self):
+        if self._neighbours is None:
+            self._neighbours = show_neighbours(self._nodes, self._h)
+        return self._neighbours
+
+
+sim = Simulation(30, 0.05)
 
 # To check matrix condition
 # import numpy as np

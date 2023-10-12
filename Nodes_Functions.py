@@ -5,7 +5,6 @@ import math
 
 def create_nodes(total_nodes, s):
     """
-
     :param total_nodes: is a scalar that states the number of nodes we would like to have inside the domain
     :param s: is a scalar that determines the average distance between points inside the comp. stencil
     :return:
@@ -17,10 +16,16 @@ def create_nodes(total_nodes, s):
     n = int(2 * h / delta)  # Calculate the number of points to be added on each side
     x = np.linspace(0 - 2 * h, 1 + 2 * h, total_nodes + 2 * n)  # Creates x coordinates with boundary
     y = np.linspace(0 - 2 * h, 1 + 2 * h, total_nodes + 2 * n)  # Creates y coordinates with boundary
-    for i in range(len(x)):  # This perturbs the initial position of the points
-        x[i] = x[i] + np.random.choice([1, -1]) * np.random.uniform(0, s / 2)
-        y[i] = y[i] + np.random.choice([1, -1]) * np.random.uniform(0, s / 2)
-    coordinates = np.column_stack((x, y))
+
+    X, Y = np.meshgrid(x, y)  # Create a 2D grid of x and y coordinates
+
+    # Perturb the coordinates
+    X_perturbed = X + (np.random.choice([1, -1], X.shape) * np.random.uniform(0, s / 2, X.shape))
+    Y_perturbed = Y + (np.random.choice([1, -1], Y.shape) * np.random.uniform(0, s / 2, Y.shape))
+
+    # Stack the perturbed coordinates
+    coordinates = np.column_stack((X_perturbed.ravel(), Y_perturbed.ravel()))
+
     return coordinates
 
 
