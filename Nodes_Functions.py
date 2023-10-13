@@ -77,7 +77,6 @@ def dist_nodes(coordinates, in_domain):
 def neighbour_nodes(distance, h):
     """
 
-    :param coordinates:
     :param h:
     :param distance:
     :return:
