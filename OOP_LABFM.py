@@ -14,7 +14,12 @@ class Simulation:
         self.h = calc_h(self.s, self.total_nodes)
         self.nodes = Nodes(self.total_nodes, self.s, self.h)
         self.discrete_operator = DiscreteOperator(self.nodes, self.polynomial, self.h)
-        self.plot = Plot(self.nodes, self.h)
+
+    def plot_domain(self):
+        return plot_nodes(self.nodes)
+
+    def plot_neighbours(self):
+        return show_neighbours(self.nodes, self.h)
 
 
 class Nodes:
@@ -31,26 +36,9 @@ class DiscreteOperator:
         self.ABF = calc_abf(nodes, h,
                             polynomial)  # When calculating the weights, should radius be magnitude or have a direction?
         self.M = calc_m(self.ABF, self.monomial)
-
-
-class Plot:
-    def __init__(self, nodes, h):
-        self._nodes = nodes
-        self._h = h
-        self._domain = None
-        self._neighbours = None
-
-    @property
-    def domain(self):
-        if self._domain is None:
-            self._domain = plot_nodes(self._nodes)
-        return self._domain
-
-    @property
-    def neighbours(self):
-        if self._neighbours is None:
-            self._neighbours = show_neighbours(self._nodes, self._h)
-        return self._neighbours
+        self.w_difX = do_weights(self.M, self.ABF, polynomial, 'x')
+        self.w_difY = do_weights(self.M, self.ABF, polynomial, 'y')
+        self.w_Laplace = do_weights(self.M, self.ABF, polynomial, 'Laplace')
 
 
 sim = Simulation(30, 0.05)

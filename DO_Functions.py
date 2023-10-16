@@ -55,7 +55,7 @@ def calc_monomial(nodes, m, h):
                 index = index + 1
             monomial_dict_index = monomial_dict_index + 1
 
-    scaling_v = scaling_matrix(m_power, h).reshape(-1,1)
+    scaling_v = scaling_matrix(m_power, h).reshape(-1, 1)
 
     for key in monomials:
         for row in range(len(monomials[key])):
@@ -129,7 +129,6 @@ def gaussian_rbf(neighbours_r, h):
     w_ji = 9 / math.pi * math.exp(-9 * (q ** 2))
 
     return w_ji
-
 
 
 def calc_abf(nodes, h, m):  # Needs to be written

@@ -14,10 +14,7 @@ def plot_nodes(nodes):
 def show_neighbours(nodes, h):
     coor = nodes.coordinates
     neigh = []
-
-
-    ref_index = np.random.randint(0, len(coor))
-    ref_node = coor[ref_index]
+    out_domain = []
 
     while True:
         sample = coor[np.random.choice(coor.shape[0])]
@@ -30,14 +27,24 @@ def show_neighbours(nodes, h):
         if r_distance <= 2 * h:
             neigh.append([x_j, y_j])
 
+    for x_i, y_i in coor:
+        if x_i < 0 or x_i > 1 or y_i < 0 or y_i > 1:
+            out_domain.append([x_i, y_i])
+
+
     neigh = np.array(neigh)
-    plt.scatter(coor[:, 0], coor[:, 1], c='blue', label='All Nodes')
-    plt.scatter(neigh[:, 0], neigh[:, 1], c='red', label='Neighbours')
+    out_domain = np.array(out_domain)
+
+    plt.scatter(coor[:, 0], coor[:, 1], c='blue', label='All Nodes', s=10)
+    plt.scatter(out_domain[:, 0], out_domain[:, 1], c='grey', label='Out of Domain', s=10)
+    plt.scatter(neigh[:, 0], neigh[:, 1], c='red', label='Neighbours', s=10)
+    plt.scatter(ref_node[0], ref_node[1], c='yellow', label='Reference Node', s=10)
     plt.xlabel('X-coordinate')
     plt.ylabel('Y-coordinate')
     plt.title('Nodes and Neighbours')
     plt.legend()
     plt.axis('equal')
     plt.grid(True)
+    plt.show()
 
-    return plt.show()
+    return
