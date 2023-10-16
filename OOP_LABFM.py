@@ -26,7 +26,7 @@ class Nodes:
     def __init__(self, total_nodes, s, h):
         self.coordinates = create_nodes(total_nodes, s)
         self.in_domain = threshold(self.coordinates)
-        self.dist_nodes = dist_nodes(self.coordinates, self.in_domain)  # this attribute might be in
+        self.dist_nodes = dist_nodes(self.coordinates, self.in_domain)
         self.neighbours_r, self.neighbours_xy = neighbour_nodes(self.dist_nodes, h)
 
 
