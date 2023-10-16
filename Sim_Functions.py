@@ -4,7 +4,7 @@ import math
 
 def calc_h(s, total_nodes):
     """FOR NOW THIS WILL BE LEFT 0.1 for now"""
-    h = 0.05  # s*()
+    h = 0.03  # s*()
     return h
 
 

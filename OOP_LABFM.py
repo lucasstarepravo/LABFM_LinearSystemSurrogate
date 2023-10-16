@@ -41,7 +41,7 @@ class DiscreteOperator:
         self.w_Laplace = do_weights(self.M, self.ABF, polynomial, 'Laplace')
 
 
-sim = Simulation(30, 0.05)
+sim = Simulation(70, 0.05)
 
 # To check matrix condition
 # import numpy as np

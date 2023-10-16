@@ -1,7 +1,4 @@
-import matplotlib
 import numpy as np
-
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 
@@ -30,7 +27,6 @@ def show_neighbours(nodes, h):
     for x_i, y_i in coor:
         if x_i < 0 or x_i > 1 or y_i < 0 or y_i > 1:
             out_domain.append([x_i, y_i])
-
 
     neigh = np.array(neigh)
     out_domain = np.array(out_domain)
