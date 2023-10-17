@@ -10,7 +10,7 @@ class Simulation:
     def __init__(self, total_nodes, s):
         self.total_nodes = total_nodes
         self.s = s
-        self.polynomial = 2  # Order of approximation that will be used in monomial
+        self.polynomial = 4  # Order of approximation that will be used in monomial
         self.h = calc_h(self.s, self.total_nodes)
         self.nodes = Nodes(self.total_nodes, self.s, self.h)
         self.discrete_operator = DiscreteOperator(self.nodes, self.polynomial, self.h)
@@ -33,15 +33,18 @@ class Nodes:
 class DiscreteOperator:
     def __init__(self, nodes, polynomial, h):
         self.monomial = calc_monomial(nodes, polynomial, h)
-        self.ABF = calc_abf(nodes, h,
-                            polynomial)  # When calculating the weights, should radius be magnitude or have a direction?
+        self.ABF = calc_abf(nodes, h, polynomial)
         self.M = calc_m(self.ABF, self.monomial)
         self.w_difX = do_weights(self.M, self.ABF, polynomial, 'x')
         self.w_difY = do_weights(self.M, self.ABF, polynomial, 'y')
         self.w_Laplace = do_weights(self.M, self.ABF, polynomial, 'Laplace')
 
 
-sim = Simulation(70, 0.05)
+sim = Simulation(100, 0.05)
+
+# M matrix condition:
+# with total_nodes = 50, s = 0.05, p = 4, cond = 6268870053.65, time to run ?
+# with total_nodes = 100, s = 0.05, p = 4, cond = 46740.85, time to run ~ 17 min
 
 # To check matrix condition
 # import numpy as np

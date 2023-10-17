@@ -2,7 +2,6 @@ import numpy as np
 import math
 
 
-# Scaling matrix still hasn't been applied to the Cd vector
 def scaling_matrix(monomial_exponent, h):
     """
 
@@ -66,11 +65,10 @@ def calc_monomial(nodes, m, h):
 
 def calc_hp(exp_a, coordinates, h):
     """
-
+    This function gives the first 10 expansions of the Hermite polynomial
     :param exp_a:
     :param coordinates:
     :param h:
-    :param m:
     :return:
     """
 

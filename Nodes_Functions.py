@@ -99,9 +99,6 @@ def neighbour_nodes(distance, h):
             for dis_x, dis_y in distance[i]:
                 r_distance = (dis_x ** 2 + dis_y ** 2) ** .5
                 if r_distance <= 2 * h:
-                    # I can add here a way to pop the items out of the distance list, the items that are out of bounds.
-                    # This would make the neighbour dictionary in cartesian coordinates only to contain nodes that will
-                    # be reference nodes
                     neighbours_radius[index].append(r_distance)
                     neighbours_cartesian[index].append([dis_x, dis_y])
             index = index + 1
