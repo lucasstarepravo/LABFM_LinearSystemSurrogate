@@ -1,6 +1,5 @@
 from Sim_Functions import calc_h
 import numpy as np
-import math
 
 
 def create_nodes(total_nodes, s):

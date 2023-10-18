@@ -8,7 +8,7 @@ def plot_nodes(nodes):
     return plt.show()
 
 
-def show_neighbours(nodes, h):
+def show_neighbours(nodes, h, size):
     coor = nodes.coordinates
     neigh = []
     out_domain = []
@@ -31,10 +31,10 @@ def show_neighbours(nodes, h):
     neigh = np.array(neigh)
     out_domain = np.array(out_domain)
 
-    plt.scatter(coor[:, 0], coor[:, 1], c='blue', label='All Nodes', s=10)
-    plt.scatter(out_domain[:, 0], out_domain[:, 1], c='grey', label='Out of Domain', s=10)
-    plt.scatter(neigh[:, 0], neigh[:, 1], c='red', label='Neighbours', s=10)
-    plt.scatter(ref_node[0], ref_node[1], c='yellow', label='Reference Node', s=10)
+    plt.scatter(coor[:, 0], coor[:, 1], c='blue', label='All Nodes', s=size)
+    plt.scatter(out_domain[:, 0], out_domain[:, 1], c='grey', label='Out of Domain', s=size)
+    plt.scatter(neigh[:, 0], neigh[:, 1], c='red', label='Neighbours', s=size)
+    plt.scatter(ref_node[0], ref_node[1], c='yellow', label='Reference Node', s=size)
     plt.xlabel('X-coordinate')
     plt.ylabel('Y-coordinate')
     plt.title('Nodes and Neighbours')

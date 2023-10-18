@@ -7,10 +7,10 @@ from Plot_Functions import *
 
 
 class Simulation:
-    def __init__(self, total_nodes, s):
+    def __init__(self, total_nodes, s, polynomial):
         self.total_nodes = total_nodes
         self.s = s
-        self.polynomial = 4  # Order of approximation that will be used in monomial
+        self.polynomial = polynomial  # Order of approximation that will be used in monomial
         self.h = calc_h(self.s, self.total_nodes)
         self.nodes = Nodes(self.total_nodes, self.s, self.h)
         self.discrete_operator = DiscreteOperator(self.nodes, self.polynomial, self.h)
@@ -18,8 +18,8 @@ class Simulation:
     def plot_domain(self):
         return plot_nodes(self.nodes)
 
-    def plot_neighbours(self):
-        return show_neighbours(self.nodes, self.h)
+    def plot_neighbours(self, size=8):
+        return show_neighbours(self.nodes, self.h, size)
 
 
 class Nodes:
@@ -40,7 +40,7 @@ class DiscreteOperator:
         self.w_Laplace = do_weights(self.M, self.ABF, polynomial, 'Laplace')
 
 
-sim = Simulation(100, 0.05)
+sim = Simulation(50, 0.05, 6)
 
 # M matrix condition:
 # with total_nodes = 50, s = 0.05, p = 4, cond = 6268870053.65, time to run ?
