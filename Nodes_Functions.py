@@ -19,11 +19,11 @@ def create_nodes(total_nodes, s):
     X, Y = np.meshgrid(x, y)  # Create a 2D grid of x and y coordinates
 
     # Perturb the coordinates
-    X_perturbed = X + (np.random.choice([1, -1], X.shape) * np.random.uniform(0, s / 2, X.shape))
-    Y_perturbed = Y + (np.random.choice([1, -1], Y.shape) * np.random.uniform(0, s / 2, Y.shape))
+    X = X + (np.random.choice([1, -1], X.shape) * np.random.uniform(0, s / 4, X.shape))
+    Y = Y + (np.random.choice([1, -1], Y.shape) * np.random.uniform(0, s / 4, Y.shape))
 
     # Stack the perturbed coordinates
-    coordinates = np.column_stack((X_perturbed.ravel(), Y_perturbed.ravel()))
+    coordinates = np.column_stack((X.ravel(), Y.ravel()))
 
     return coordinates
 

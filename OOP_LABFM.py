@@ -7,10 +7,10 @@ from Plot_Functions import *
 
 
 class Simulation:
-    def __init__(self, total_nodes, s, polynomial):
+    def __init__(self, total_nodes, polynomial):
         self.total_nodes = total_nodes
-        self.s = s
-        self.polynomial = polynomial  # Order of approximation that will be used in monomial
+        self.s = 1.0 / (total_nodes - 1)
+        self.polynomial = polynomial
         self.h = calc_h(self.s, self.total_nodes)
         self.nodes = Nodes(self.total_nodes, self.s, self.h)
         self.discrete_operator = DiscreteOperator(self.nodes, self.polynomial, self.h)
@@ -40,11 +40,8 @@ class DiscreteOperator:
         self.w_Laplace = do_weights(self.M, self.ABF, polynomial, 'Laplace')
 
 
-sim = Simulation(50, 0.05, 6)
+sim = Simulation(50, 2)
 
-# M matrix condition:
-# with total_nodes = 50, s = 0.05, p = 4, cond = 6268870053.65, time to run ?
-# with total_nodes = 100, s = 0.05, p = 4, cond = 46740.85, time to run ~ 17 min
 
 # To check matrix condition
 # import numpy as np
