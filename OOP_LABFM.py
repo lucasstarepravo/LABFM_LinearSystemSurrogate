@@ -9,13 +9,13 @@ from Test_Functions import *
 
 class Simulation:
     def __init__(self, total_nodes, polynomial):
-        self.total_nodes = total_nodes
-        self.s = 1.0 / (total_nodes - 1)
-        self.polynomial = polynomial
-        self.h = calc_h(self.s, self.polynomial)
-        self.nodes = Nodes(self.total_nodes, self.s, self.h, self.polynomial)
+        self.total_nodes       = total_nodes
+        self.s                 = 1.0 / (total_nodes - 1)
+        self.polynomial        = polynomial
+        self.h                 = calc_h(self.s, self.polynomial)
+        self.nodes             = Nodes(self.total_nodes, self.s, self.h, self.polynomial)
         self.discrete_operator = DiscreteOperator(self.nodes, self.polynomial, self.h)
-        self.test_function = TestFunction(self.nodes, self.discrete_operator)
+        self.test_function     = TestFunction(self.nodes, self.discrete_operator)
 
     def plot_domain(self):
         return plot_nodes(self.nodes)
@@ -26,31 +26,32 @@ class Simulation:
 
 class Nodes:
     def __init__(self, total_nodes, s, h, polynomial):
-        self.coordinates = create_nodes(total_nodes, s, polynomial)
-        self.in_domain = threshold(self.coordinates)
-        self.dist_nodes = dist_nodes(self.coordinates, self.in_domain)
+        self.coordinates    = create_nodes(total_nodes, s, polynomial)
+        self.in_domain      = threshold(self.coordinates)
+        self.dist_nodes     = dist_nodes(self.coordinates, self.in_domain)
         self.neighbours_r, self.neighbours_xy = neighbour_nodes(self.dist_nodes, h)
 
 
 class DiscreteOperator:
     def __init__(self, nodes, polynomial, h):
-        self.monomial = calc_monomial(nodes, polynomial, h)
-        self.ABF = calc_abf(nodes, h, polynomial)
-        self.M = calc_m(self.ABF, self.monomial)
-        self.w_difX = do_weights(self.M, self.ABF, polynomial, 'x')
-        self.w_difY = do_weights(self.M, self.ABF, polynomial, 'y')
-        self.w_Laplace = do_weights(self.M, self.ABF, polynomial, 'Laplace')
+        self.monomial   = calc_monomial(nodes, polynomial, h)
+        self.ABF        = calc_abf(nodes, h, polynomial)
+        self.M          = calc_m(self.ABF, self.monomial)
+        self.w_difX     = do_weights(self.M, self.ABF, polynomial, 'x')
+        self.w_difY     = do_weights(self.M, self.ABF, polynomial, 'y')
+        self.w_Laplace  = do_weights(self.M, self.ABF, polynomial, 'Laplace')
 
 
 class TestFunction:
     def __init__(self, nodes, discrete_operator):
-        self.surface_value = test_function(nodes)
-        self.dT_dx_analytical = dt_dx_analytical(nodes)
-        self.dT_dy_analytical = dt_dy_analytical(nodes)
-        self.laplace_phi = laplace_phi(nodes)
-        self.dT_dx_DO = dt_dx_do(nodes, discrete_operator, self.surface_value)
-        self.dT_dy_DO = dt_dy_do(nodes, discrete_operator, self.surface_value)
-        self.laplace_phi_DO = laplace_do(nodes, discrete_operator, self.surface_value)
+        self.surface_value    = test_function(nodes)
+        self.dT_dx_analytical = dif_analytical(nodes, 'dtdx')
+        self.dT_dy_analytical = dif_analytical(nodes, 'dtdy')
+        self.laplace_phi      = laplace_phi(nodes)
+        self._packed_dic      = match_nodes(nodes, self.surface_value)
+        self.dT_dx_DO         = dt_dx_do(nodes, discrete_operator, self.surface_value)
+        self.dT_dy_DO         = dt_dy_do(nodes, discrete_operator, self.surface_value)
+        self.laplace_phi_DO   = laplace_do(nodes, discrete_operator, self.surface_value)
 
 
 sim = Simulation(20, 2)
