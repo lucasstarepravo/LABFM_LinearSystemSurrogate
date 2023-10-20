@@ -2,7 +2,7 @@ from Nodes_Functions import *
 from DO_Functions import *
 from Sim_Functions import *
 from Plot_Functions import *
-from Test_Function import *
+from Test_Functions import *
 
 '''Simulation over a unit plane'''
 
@@ -53,9 +53,7 @@ class TestFunction:
         self.laplace_phi_DO = laplace_do(nodes, discrete_operator, self.surface_value)
 
 
-
 sim = Simulation(20, 2)
-
 
 # To check matrix condition
 # import numpy as np

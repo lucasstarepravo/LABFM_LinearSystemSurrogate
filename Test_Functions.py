@@ -88,7 +88,7 @@ def dt_dx_do(nodes, discrete_operator, surface_value):
     :return:
     """
     w_difx = discrete_operator.w_difX
-    for i in w_difx:
+    #for i in w_difx:
 
 
 
