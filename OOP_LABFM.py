@@ -2,6 +2,7 @@ from Nodes_Functions import *
 from DO_Functions import *
 from Sim_Functions import *
 from Plot_Functions import *
+from Test_Function import *
 
 '''Simulation over a unit plane'''
 
@@ -14,6 +15,7 @@ class Simulation:
         self.h = calc_h(self.s, self.polynomial)
         self.nodes = Nodes(self.total_nodes, self.s, self.h, self.polynomial)
         self.discrete_operator = DiscreteOperator(self.nodes, self.polynomial, self.h)
+        self.test_function = TestFunction(self.nodes, self.discrete_operator)
 
     def plot_domain(self):
         return plot_nodes(self.nodes)
@@ -42,10 +44,17 @@ class DiscreteOperator:
 
 class TestFunction:
     def __init__(self, nodes, discrete_operator):
-        self.surface_value = 1
+        self.surface_value = test_function(nodes)
+        self.dT_dx_analytical = dt_dx_analytical(nodes)
+        self.dT_dy_analytical = dt_dy_analytical(nodes)
+        self.laplace_phi = laplace_phi(nodes)
+        self.dT_dx_DO = dt_dx_do(nodes, discrete_operator, self.surface_value)
+        self.dT_dy_DO = dt_dy_do(nodes, discrete_operator, self.surface_value)
+        self.laplace_phi_DO = laplace_do(nodes, discrete_operator, self.surface_value)
 
 
-sim = Simulation(50, 4)
+
+sim = Simulation(20, 2)
 
 
 # To check matrix condition
