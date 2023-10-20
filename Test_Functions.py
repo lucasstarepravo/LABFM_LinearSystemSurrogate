@@ -8,46 +8,27 @@ def test_function(nodes):
     return 1 + (x * y) ** 4 + (x * y) ** 8 + x ** 2 + y ** 2 + sum([x**n + y**n for n in range(1, 7)])
 
 
-def dt_dx_analytical(nodes):
+def dif_analytical(nodes, derivative):
     """
+    :param derivative:
     :param nodes:
     :return:
     """
-    x = nodes.coordinates[:, 0] - .1453
-    y = nodes.coordinates[:, 1] - .16401
+    if derivative not in ['dtdx', 'dtdy']:
+        raise ValueError("Invalid derivative type")
 
-    # Terms from the derived expression
-    term1 = 1
-    term2 = 2 * x
-    term3 = 3 * x ** 2
-    term4 = 4 * x ** 3
-    term5 = 5 * x ** 4
-    term6 = 6 * x ** 5
-    term7 = 4 * x ** 3 * y ** 4
-    term8 = 8 * x ** 7 * y ** 8
+    # Determine the variable of interest based on the derivative
+    var = nodes.coordinates[:, 0] - .1453 if derivative == 'dtdx' else nodes.coordinates[:, 1] - .16401
+    const = nodes.coordinates[:, 1] - .16401 if derivative == 'dtdx' else nodes.coordinates[:, 0] - .1453
 
-    return term1 + term2 + term3 + term4 + term5 + term6 + term7 + term8
+    # Calculate the terms using a loop
+    result = sum((i + 1) * var ** i for i in range(6))
 
+    # Add the additional terms
+    result += 4 * var ** 3 * const ** 4
+    result += 8 * var ** 7 * const ** 8
 
-def dt_dy_analytical(nodes):
-    """
-    :param nodes:
-    :return:
-    """
-    x = nodes.coordinates[:, 0] - .1453
-    y = nodes.coordinates[:, 1] - .16401
-
-    # Terms from the derived expression for dϕ/dy0
-    term1 = 1
-    term2 = 2 * y
-    term3 = 3 * y ** 2
-    term4 = 4 * y ** 3
-    term5 = 5 * y ** 4
-    term6 = 6 * y ** 5
-    term7 = 4 * y ** 3 * x ** 4
-    term8 = 8 * y ** 7 * x ** 8
-
-    return term1 + term2 + term3 + term4 + term5 + term6 + term7 + term8
+    return result
 
 
 def laplace_phi(nodes):
@@ -76,7 +57,8 @@ def laplace_phi(nodes):
     return term1 + term2 + term3 + term4 + term5 + term6 + term7 + term8 + term9 + term10 + term11 + term12 + term13
 
 
-
+def match_nodes(nodes, surface_value):
+    return
 
 
 def dt_dx_do(nodes, discrete_operator, surface_value):
@@ -88,6 +70,10 @@ def dt_dx_do(nodes, discrete_operator, surface_value):
     :return:
     """
     w_difx = discrete_operator.w_difX
+
+    # First, it is required to match the surface value with the corresponding node, and both values then need to be
+    # matched with the corresponding weight. The weights are stored in a dictionary, where the key is the node index
+
     #for i in w_difx:
 
 
