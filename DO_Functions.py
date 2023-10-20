@@ -33,6 +33,7 @@ def monomial_power(polynomial):
 def calc_monomial(nodes, m, h):
     """
 
+    :param h:
     :param nodes:
     :param m:
     :return:
@@ -152,7 +153,7 @@ def calc_abf(nodes, h, m):  # Needs to be written
             for j in range(len(neigh_r[i])):
                 w_jid = []
                 for k in range(n):
-                    w_jid.append(gaussian_rbf(neigh_r[i][j], h) / (2 ** (m_power[k, 0] + m_power[k, 1])) ** .5 * \
+                    w_jid.append(gaussian_rbf(neigh_r[i][j], h) / ((2 ** (m_power[k, 0] + m_power[k, 1])) ** .5) * \
                                  calc_hp(m_power[k, 0], neigh_xy[i][j][0], h) * \
                                  calc_hp(m_power[k, 1], neigh_xy[i][j][1], h))
                 basis_func[index][j, :] = np.array(w_jid)

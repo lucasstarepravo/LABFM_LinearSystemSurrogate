@@ -9,7 +9,7 @@ def calc_h(s, polynomial):
     :return:
     """
     if polynomial == 2:
-        h = 1 * s
+        h = 1.2 * s
     elif polynomial == 4:
         h = 1.5 * s
     elif polynomial == 6:
