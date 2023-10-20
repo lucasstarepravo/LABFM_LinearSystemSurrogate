@@ -1,9 +1,24 @@
 import numpy as np
 
 
-def calc_h(s, total_nodes):
-    """FOR NOW THIS WILL BE LEFT 0.1 for now"""
-    h = 0.03  # s*()
+def calc_h(s, polynomial):
+    """
+
+    :param s:
+    :param polynomial:
+    :return:
+    """
+    if polynomial == 2:
+        h = 1 * s
+    elif polynomial == 4:
+        h = 1.5 * s
+    elif polynomial == 6:
+        h = 2 * s
+    elif polynomial == 8:
+        h = 2.5 * s
+    else:
+        raise ValueError("The polynomial argument must be 2, 4, 6, or 8")
+
     return h
 
 

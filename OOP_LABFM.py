@@ -11,8 +11,8 @@ class Simulation:
         self.total_nodes = total_nodes
         self.s = 1.0 / (total_nodes - 1)
         self.polynomial = polynomial
-        self.h = calc_h(self.s, self.total_nodes)
-        self.nodes = Nodes(self.total_nodes, self.s, self.h)
+        self.h = calc_h(self.s, self.polynomial)
+        self.nodes = Nodes(self.total_nodes, self.s, self.h, self.polynomial)
         self.discrete_operator = DiscreteOperator(self.nodes, self.polynomial, self.h)
 
     def plot_domain(self):
@@ -23,8 +23,8 @@ class Simulation:
 
 
 class Nodes:
-    def __init__(self, total_nodes, s, h):
-        self.coordinates = create_nodes(total_nodes, s)
+    def __init__(self, total_nodes, s, h, polynomial):
+        self.coordinates = create_nodes(total_nodes, s, polynomial)
         self.in_domain = threshold(self.coordinates)
         self.dist_nodes = dist_nodes(self.coordinates, self.in_domain)
         self.neighbours_r, self.neighbours_xy = neighbour_nodes(self.dist_nodes, h)
@@ -40,7 +40,12 @@ class DiscreteOperator:
         self.w_Laplace = do_weights(self.M, self.ABF, polynomial, 'Laplace')
 
 
-sim = Simulation(50, 2)
+class TestFunction:
+    def __init__(self, nodes, discrete_operator):
+        self.surface_value = 1
+
+
+sim = Simulation(50, 4)
 
 
 # To check matrix condition

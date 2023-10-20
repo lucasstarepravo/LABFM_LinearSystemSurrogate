@@ -2,7 +2,7 @@ from Sim_Functions import calc_h
 import numpy as np
 
 
-def create_nodes(total_nodes, s):
+def create_nodes(total_nodes, s, polynomial):
     """
     :param total_nodes: is a scalar that states the number of nodes we would like to have inside the domain
     :param s: is a scalar that determines the average distance between points inside the comp. stencil
@@ -11,7 +11,7 @@ def create_nodes(total_nodes, s):
     y coordinates, respectively. It is possible to access the ith node with "coordinates[i]"
     """
     delta = 1.0 / (total_nodes - 1)  # Determine the spacing delta between the points in the original domain
-    h = calc_h(s, total_nodes)
+    h = calc_h(s, polynomial)
     n = int(2 * h / delta)  # Calculate the number of points to be added on each side
     x = np.linspace(0 - 2 * h, 1 + 2 * h, total_nodes + 2 * n)  # Creates x coordinates with boundary
     y = np.linspace(0 - 2 * h, 1 + 2 * h, total_nodes + 2 * n)  # Creates y coordinates with boundary
