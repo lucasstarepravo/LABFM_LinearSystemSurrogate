@@ -24,6 +24,7 @@ def create_nodes(total_nodes, s, polynomial):
 
     # Stack the perturbed coordinates
     coordinates = np.column_stack((X.ravel(), Y.ravel()))
+    coordinates = np.around(coordinates, 11)
 
     return coordinates
 
@@ -73,9 +74,9 @@ def dist_nodes(coordinates, in_domain):
     return distance
 
 
-def neighbour_nodes(distance, h):
+def neighbour_nodes(distance, h, coordinates):
     """
-
+    :param coordinates:
     :param h:
     :param distance:
     :return:
@@ -84,21 +85,24 @@ def neighbour_nodes(distance, h):
     list corresponds to the radial distance between the reference point and the neighbours. Note that inside the neighbours
     list there will also be the reference point inside, with distance (0,0)
     """
-    neighbours_radius = {}  # N_inside has the values
+    neighbours_radius = {}
     neighbours_cartesian = {}
-    index = 0
-    for i in range(len(distance)):
-        neighbours_radius[index] = []
-        neighbours_cartesian[index] = []
-        if not distance[i]:
-            neighbours_radius[index] = None
-            neighbours_cartesian[index] = None
-            index = index + 1
+    neighbours_coordinates = {}
+
+    for index, (key, ref_node_dist) in enumerate(distance.items()):
+        if not ref_node_dist:
+            neighbours_radius[key] = neighbours_cartesian[key] = neighbours_coordinates[key] = None
         else:
-            for dis_x, dis_y in distance[i]:
-                r_distance = (dis_x ** 2 + dis_y ** 2) ** .5
+            neighbours_radius[key] = []
+            neighbours_cartesian[key] = []
+            neighbours_coordinates[key] = []
+
+            for dis_x, dis_y in ref_node_dist:
+                r_distance = (dis_x ** 2 + dis_y ** 2) ** 0.5
                 if r_distance <= 2 * h:
-                    neighbours_radius[index].append(r_distance)
-                    neighbours_cartesian[index].append([dis_x, dis_y])
-            index = index + 1
-    return neighbours_radius, neighbours_cartesian
+                    neighbours_radius[key].append(round(r_distance, 11))
+                    neighbours_cartesian[key].append([round(dis_x, 11), round(dis_y, 11)])
+                    neighbours_coordinates[key].append([round(dis_x + coordinates[key, 0], 11), round(dis_y + coordinates[key, 1], 11)])
+
+    return neighbours_radius, neighbours_cartesian, neighbours_coordinates
+
