@@ -1,11 +1,17 @@
+import numpy as np
+
+
 def test_function(nodes):
     """
     :param nodes:
     :return:
     """
+
     x = nodes.coordinates[:, 0] - .1453
     y = nodes.coordinates[:, 1] - .16401
-    return 1 + (x * y) ** 4 + (x * y) ** 8 + x ** 2 + y ** 2 + sum([x**n + y**n for n in range(1, 7)])
+    phi = 1 + (x * y) ** 4 + (x * y) ** 8 + x ** 2 + y ** 2 + sum([x ** n + y ** n for n in range(1, 7)])
+    phi_dict = {(nodes.coordinates[i, 0], nodes.coordinates[i, 1]): phi[i] for i in range(phi.shape[0])}
+    return phi_dict
 
 
 def dif_analytical(nodes, derivative):
@@ -57,41 +63,50 @@ def laplace_phi(nodes):
     return term1 + term2 + term3 + term4 + term5 + term6 + term7 + term8 + term9 + term10 + term11 + term12 + term13
 
 
-def match_nodes(nodes, surface_value):
-    return
+def create_dict(array, coordinates, in_domain=None):
+    output = {}
+
+    if in_domain is None:
+        return {(coordinates[i, 0], coordinates[i, 1]): array[i] for i in range(len(array))}
+    else:
+        index = 0
+        for i in range(len(coordinates)):
+            if in_domain[i] is False:
+                continue
+            else:
+                output[(coordinates[i, 0], coordinates[i, 1])] = array[index]
+                index = index + 1
+        return output
 
 
-def dt_dx_do(nodes, discrete_operator, surface_value):
+def dif_do(nodes, discrete_operator, surface_value, derivative):
     """
-
-    :param surface_value:
     :param nodes:
     :param discrete_operator:
-    :return:
-    """
-    w_difx = discrete_operator.w_difX
-
-    # First, it is required to match the surface value with the corresponding node, and both values then need to be
-    # matched with the corresponding weight. The weights are stored in a dictionary, where the key is the node index
-
-    #for i in w_difx:
-
-
-
-
-    return
-
-
-def dt_dy_do(nodes, discrete_operator, surface_value):
-    """
-
     :param surface_value:
-    :param nodes:
-    :param discrete_operator:
+    :param derivative:
     :return:
     """
+    neigh = create_dict(nodes.neighbours_coor, nodes.coordinates)
 
-    return
+    if derivative == 'dtdx':
+        w_dif = create_dict(discrete_operator.w_difX, nodes.coordinates, nodes.in_domain)
+    elif derivative == 'dtdy':
+        w_dif = create_dict(discrete_operator.w_difY, nodes.coordinates, nodes.in_domain)
+    else:
+        raise ValueError(f"Unknown derivative: {derivative}")
+
+    # This calculates the approximation of the derivative
+    dif_approx = {}
+    for ref_node in w_dif:
+        if neigh[ref_node] is None:
+            continue
+        surface_dif = np.array([surface_value[tuple(n_node)] - surface_value[ref_node] for n_node in neigh[ref_node]]).reshape(1, -1)
+        w_ref_node = w_dif[ref_node].reshape(-1, 1)
+        dif_approx[ref_node] = np.dot(surface_dif, w_ref_node)
+
+    return dif_approx
+
 
 
 def laplace_do(nodes, discrete_operator, surface_value):
