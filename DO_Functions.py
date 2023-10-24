@@ -29,6 +29,7 @@ def monomial_power(polynomial):
                          for i in range(total_polynomial + 1)]
     return np.array(monomial_exponent)
 
+
 # This is the first function that ignore the Nodes without neighbours
 def calc_monomial(nodes, m, h):
     """
@@ -40,26 +41,27 @@ def calc_monomial(nodes, m, h):
     """
     neighbours = nodes.neighbours_xy
     monomials = {}
-    monomial_dict_index = 0
     m_power = monomial_power(m)
 
-    for i in range(len(neighbours)):
-        if neighbours[i] is None:
-            continue
+    for key1 in neighbours:
+        if neighbours[key1] is None:
+            monomials[key1] = None
         else:
-            index = 0
-            monomials[monomial_dict_index] = np.zeros((len(neighbours[i]), len(m_power)))
+            index1 = 0
+            monomials[key1] = np.zeros((len(neighbours[key1]), len(m_power)))
             for power_x, power_y in m_power:
-                monomials[monomial_dict_index][:, index] = np.array(neighbours[i])[:, 0] ** power_x * \
-                                                           np.array(neighbours[i])[:, 1] ** power_y
-                index = index + 1
-            monomial_dict_index = monomial_dict_index + 1
+                monomials[key1][:, index1] = np.array(neighbours[key1])[:, 0] ** power_x * \
+                                             np.array(neighbours[key1])[:, 1] ** power_y
+                index1 = index1 + 1
 
     scaling_v = scaling_matrix(m_power, h).reshape(-1, 1)
 
     for key in monomials:
-        for row in range(len(monomials[key])):
-            monomials[key][row, :] = monomials[key][row, :] * scaling_v.T
+        if monomials[key] is None:
+            continue
+        else:
+            for row in range(len(monomials[key])):
+                monomials[key][row, :] = monomials[key][row, :] * scaling_v.T
 
     return monomials
 
@@ -125,7 +127,7 @@ def gaussian_rbf(neighbours_r, h):
 
     q = neighbours_r / h
 
-    w_ji = 9 / math.pi * math.exp(-9 * (q ** 2))
+    w_ji = (9 / math.pi) * math.exp(-9 * (q ** 2))
 
     return w_ji
 
@@ -141,23 +143,21 @@ def calc_abf(nodes, h, m):  # Needs to be written
     neigh_r = nodes.neighbours_r
     neigh_xy = nodes.neighbours_xy
     basis_func = {}
-    index = 0
     m_power = monomial_power(m)
     n = len(m_power)
 
-    for i in neigh_r:
-        if neigh_r[i] is None:
-            continue
+    for ref_node in neigh_r:
+        if neigh_r[ref_node] is None:
+            basis_func[ref_node] = None
         else:
-            basis_func[index] = np.zeros((len(neigh_r[i]), n))
-            for j in range(len(neigh_r[i])):
+            basis_func[ref_node] = np.zeros((len(neigh_r[ref_node]), n))
+            for j in range(len(neigh_r[ref_node])):
                 w_jid = []
                 for k in range(n):
-                    w_jid.append(gaussian_rbf(neigh_r[i][j], h) / ((2 ** (m_power[k, 0] + m_power[k, 1])) ** .5) * \
-                                 calc_hp(m_power[k, 0], neigh_xy[i][j][0], h) * \
-                                 calc_hp(m_power[k, 1], neigh_xy[i][j][1], h))
-                basis_func[index][j, :] = np.array(w_jid)
-            index = index + 1
+                    w_jid.append(gaussian_rbf(neigh_r[ref_node][j], h) / ((2 ** (m_power[k, 0] + m_power[k, 1])) ** .5) * \
+                                 calc_hp(m_power[k, 0], neigh_xy[ref_node][j][0], h) * \
+                                 calc_hp(m_power[k, 1], neigh_xy[ref_node][j][1], h))
+                basis_func[ref_node][j, :] = np.array(w_jid)
 
     return basis_func
 
@@ -169,14 +169,64 @@ def calc_m(basis_func, monomial):
     :param basis_func:
     :return:
     """
-
-    index = 0
     m = {}
-
     for i in basis_func:
-        m[index] = np.zeros((basis_func[i].shape[1], monomial[i].shape[1]))
-        for j in range(len(basis_func[index])):
-            m[index] = m[index] + np.outer(monomial[i][j], basis_func[i][j])
-        index = index + 1
+        if basis_func[i] is None:
+            m[i] = None
+        else:
+            m[i] = np.zeros((basis_func[i].shape[1], monomial[i].shape[1]))
+            for j in range(len(basis_func[i])):
+                m[i] = m[i] + np.outer(monomial[i][j], basis_func[i][j])
 
     return m
+
+
+def pointing_v(polynomial, d):
+    """
+
+    :param polynomial:
+    :param d:
+    :return:
+    """
+
+    if d not in ["x", "y", "Laplace"]:
+        raise ValueError("The valid_string argument must be 'x', 'y', or 'Laplace'")
+
+    n = int((polynomial ** 2 + 3 * polynomial) / 2)
+    cd = np.zeros((n, 1))
+    if d == 'x':
+        cd[0] = 1
+    elif d == 'y':
+        cd[1] = 1
+    elif d == 'Laplace':
+        cd[2] = 2
+        cd[4] = 4
+    return cd
+
+
+def do_weights(m, abf, polynomial, h, derivative):
+    """
+
+    :param derivative:
+    :param h:
+    :param m:
+    :param abf:
+    :param polynomial:
+    :param d:
+    :return:
+    """
+    w_dif = {}
+    cd = pointing_v(polynomial, derivative)
+    m_power = monomial_power(polynomial)
+    scaling_v = scaling_matrix(m_power, h).reshape(-1, 1)
+    cd = cd * scaling_v
+
+    for ref_node_i in m:
+        if m[ref_node_i] is None:
+            w_dif[ref_node_i] = None
+        else:
+            w_dif[ref_node_i] = np.zeros((abf[ref_node_i].shape[0], 1))
+            psi_w = np.linalg.solve(m[ref_node_i], cd)
+            w_dif[ref_node_i] = abf[ref_node_i] @ psi_w
+
+    return w_dif

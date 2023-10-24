@@ -89,21 +89,21 @@ def dif_do(nodes, discrete_operator, surface_value, derivative):
     :param derivative:
     :return:
     """
-    neigh = create_dict(nodes.neighbours_coor, nodes.coordinates)
+    neigh = nodes.neighbours_coor
 
-    if derivative == 'dtdx':
-        w_dif = create_dict(discrete_operator.w_difX, nodes.coordinates, nodes.in_domain)
-    elif derivative == 'dtdy':
-        w_dif = create_dict(discrete_operator.w_difY, nodes.coordinates, nodes.in_domain)
-    else:
-        raise ValueError(f"Unknown derivative: {derivative}")
+    if derivative not in ["dtdx", "dtdy", "Laplace"]:
+        raise ValueError("The valid_string argument must be 'dtdx', 'dtdy', or 'Laplace'")
 
+    if derivative == "dtdx":
+        w_dif = discrete_operator.w_difX
+    elif derivative == "dtdy":
+        w_dif = discrete_operator.w_difY
     # This calculates the approximation of the derivative
     dif_approx = {}
     for ref_node in w_dif:
         if neigh[ref_node] is None:
             continue
-        surface_dif = np.array([surface_value[tuple(n_node)] - surface_value[ref_node] for n_node in neigh[ref_node]]).reshape(1, -1)
+        surface_dif = np.array([surface_value[tuple(n_node)] - surface_value[tuple(ref_node)] for n_node in neigh[ref_node]]).reshape(1, -1)
         w_ref_node = w_dif[ref_node].reshape(-1, 1)
         dif_approx[ref_node] = np.dot(surface_dif, w_ref_node)
 

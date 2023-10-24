@@ -36,12 +36,13 @@ def threshold(coordinates):  # check whether the node is inside or outside the d
     :param coordinates: list of lists containing the coordinates of all nodes
     :return: return a list stating whether a point is inside the domain or not (i.e., it is a reference node or not)
     """
-    in_domain = []
-    for x_i, y_i in coordinates:  # Looping for every node
+    in_domain = {}
+    for x_i, y_i in coordinates:
         if x_i > 1 or x_i < 0 or y_i > 1 or y_i < 0:
-            in_domain.append(False)
+            in_domain[(x_i, y_i)] = False
         else:
-            in_domain.append(True)
+            in_domain[(x_i, y_i)] = True
+
     return in_domain
 
 
@@ -58,19 +59,16 @@ def dist_nodes(coordinates, in_domain):
     """
 
     distance = {}
-    index = 0
     for x_i, y_i in coordinates:
-        distance[index] = []
-        if not in_domain[index]:
-            distance[index] = None
-            index = index + 1
-        else:  # The resulting matrix when calculating x_i and x_j is symmetric, so there might be a way to improve comp. efficiency
-            # the distance from the first to the second value is of equal magnitude but with opposite sign to the distance of the second to the first
+        distance[(x_i, y_i)] = []
+        if not in_domain[(x_i, y_i)]:
+            distance[(x_i, y_i)] = None
+        else:
             for x_j, y_j in coordinates:
                 x_dist = (x_j - x_i)
                 y_dist = (y_j - y_i)
-                distance[index].append([x_dist, y_dist])
-            index = index + 1
+                distance[(x_i, y_i)].append([x_dist, y_dist])
+
     return distance
 
 
@@ -89,20 +87,20 @@ def neighbour_nodes(distance, h, coordinates):
     neighbours_cartesian = {}
     neighbours_coordinates = {}
 
-    for index, (key, ref_node_dist) in enumerate(distance.items()):
-        if not ref_node_dist:
+    for index, (key, neigh_dist) in enumerate(distance.items()):
+        if neigh_dist is None:
             neighbours_radius[key] = neighbours_cartesian[key] = neighbours_coordinates[key] = None
         else:
             neighbours_radius[key] = []
             neighbours_cartesian[key] = []
             neighbours_coordinates[key] = []
 
-            for dis_x, dis_y in ref_node_dist:
+            for dis_x, dis_y in neigh_dist:
                 r_distance = (dis_x ** 2 + dis_y ** 2) ** 0.5
                 if r_distance <= 2 * h:
                     neighbours_radius[key].append(round(r_distance, 11))
                     neighbours_cartesian[key].append([round(dis_x, 11), round(dis_y, 11)])
-                    neighbours_coordinates[key].append([round(dis_x + coordinates[key, 0], 11), round(dis_y + coordinates[key, 1], 11)])
+                    neighbours_coordinates[key].append(
+                        [round(dis_x + key[0], 11), round(dis_y + key[1], 11)])
 
     return neighbours_radius, neighbours_cartesian, neighbours_coordinates
-

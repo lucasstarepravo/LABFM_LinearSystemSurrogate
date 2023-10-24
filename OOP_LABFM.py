@@ -16,15 +16,15 @@ class Simulation:
         self.nodes             = Nodes(self.total_nodes, self.s, self.h, self.polynomial)
         self.discrete_operator = DiscreteOperator(self.nodes, self.polynomial, self.h)
         self.test_function     = TestFunction(self.nodes, self.discrete_operator)
-        self.dx_l2             = calc_l2(self.test_function, 'dtdx')
-        self.dy_l2             = calc_l2(self.test_function, 'dtdy')
+        self.dtdx_l2           = calc_l2(self.test_function, 'dtdx')
+        self.dtdy_l2           = calc_l2(self.test_function, 'dtdy')
         # self.laplace_l2        = calc_l2(self.test_function, 'Laplace')
 
     def plot_neighbours(self, size=8):
-        return show_neighbours(self.nodes, self.h, size)
+        return show_neighbours(self.nodes, size)
 
-    def plot_weights(self, size=7):
-        return plot_weights(self.nodes, self.discrete_operator, size)
+    def plot_weights(self, size=10, derivative='dtdx'):
+        return plot_weights(self.nodes, self.discrete_operator, size, derivative)
 
 
 class Nodes:
@@ -40,9 +40,9 @@ class DiscreteOperator:
         self.monomial  = calc_monomial(nodes, polynomial, h)
         self.ABF       = calc_abf(nodes, h, polynomial)
         self.M         = calc_m(self.ABF, self.monomial)
-        self.w_difX    = do_weights(self.M, self.ABF, polynomial, 'x')
-        self.w_difY    = do_weights(self.M, self.ABF, polynomial, 'y')
-        self.w_Laplace = do_weights(self.M, self.ABF, polynomial, 'Laplace')
+        self.w_difX    = do_weights(self.M, self.ABF, polynomial, h, 'x')
+        self.w_difY    = do_weights(self.M, self.ABF, polynomial, h, 'y')
+        self.w_Laplace = do_weights(self.M, self.ABF, polynomial, h, 'Laplace')
 
 
 class TestFunction:
@@ -56,7 +56,7 @@ class TestFunction:
         #self.laplace_DO    = laplace_do(nodes, discrete_operator, self.surface_value, 'Laplace')
 
 
-sim = Simulation(50, 4)
+sim = Simulation(50, 6)
 
 # To check matrix condition
 # import numpy as np

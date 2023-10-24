@@ -22,49 +22,6 @@ def calc_h(s, polynomial):
     return h
 
 
-def pointing_v(polynomial, d):
-    """
-
-    :param polynomial:
-    :param d:
-    :return:
-    """
-
-    if d not in ["x", "y", "Laplace"]:
-        raise ValueError("The valid_string argument must be 'x', 'y', or 'Laplace'")
-
-    n = int((polynomial ** 2 + 3 * polynomial) / 2)
-    cd = np.zeros((n, 1))
-    if d == 'x':
-        cd[0] = 1
-    elif d == 'y':
-        cd[1] = 1
-    elif d == 'Laplace':
-        cd[2] = 2
-        cd[4] = 4
-    return cd
-
-
-def do_weights(m, abf, polynomial, d):
-    """
-
-    :param m:
-    :param abf:
-    :param polynomial:
-    :param d:
-    :return:
-    """
-    w_dif = {}
-    cd = pointing_v(polynomial, d)
-
-    for ref_node_i in m:
-        w_dif[ref_node_i] = np.zeros((abf[ref_node_i].shape[0], 1))
-        psi_w = np.linalg.solve(m[ref_node_i], cd)
-        w_dif[ref_node_i] = abf[ref_node_i] @ psi_w
-
-    return w_dif
-
-
 def calc_l2(test_function, derivative):
 
     if derivative not in ['dtdx', 'dtdy']:
@@ -81,5 +38,6 @@ def calc_l2(test_function, derivative):
     #    dx_aprox = test_function.laplace_DO
 
     l2 = np.array([(dt_analy[ref_node] - dt_aprox[ref_node]) ** 2 for ref_node in dt_aprox])
-    l2 = np.sqrt(np.sum(l2) / l2.size)
+    norm = np.sqrt(np.array([dt_analy[ref_node] ** 2 for ref_node in dt_analy]))
+    l2 = np.sqrt(np.sum(l2))/np.sum(norm)
     return l2
