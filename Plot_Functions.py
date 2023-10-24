@@ -1,11 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
-
-def plot_nodes(nodes):
-    plt.scatter(nodes.coordinates[:, 0], nodes.coordinates[:, 1], marker='o')
-
-    return plt.show()
+from Test_Functions import create_dict
 
 
 def show_neighbours(nodes, h, size):
@@ -43,4 +38,24 @@ def show_neighbours(nodes, h, size):
     plt.grid(True)
     plt.show()
 
+    return
+
+
+def plot_weights(nodes, discrete_operator, size):
+    coor = nodes.coordinates
+    while True:
+        sample = coor[np.random.choice(coor.shape[0])]
+        if 0 <= sample[0] <= 1 and 0 <= sample[1] <= 1:
+            ref_node = sample
+            break
+
+    w_difx = create_dict(discrete_operator.w_difX, nodes.coordinates, nodes.in_domain)
+
+    ref_weights = np.array(discrete_operator.w_difX[tuple(ref_node)])
+    ref_neigh = np.array(nodes.neighbours_coor[np.where(coor == ref_node)[0][0]])
+    plt.scatter(ref_node[0], ref_node[1], c='blue', label='Reference Node', s=size)
+    plt.scatter(ref_neigh[:, 0], ref_neigh[:, 1], c=ref_weights, label='Neighbour nodes', s=size, cmap='viridis')
+    plt.colorbar()
+    plt.legend()
+    plt.show()
     return

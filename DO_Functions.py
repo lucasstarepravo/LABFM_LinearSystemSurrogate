@@ -29,7 +29,7 @@ def monomial_power(polynomial):
                          for i in range(total_polynomial + 1)]
     return np.array(monomial_exponent)
 
-
+# This is the first function that ignore the Nodes without neighbours
 def calc_monomial(nodes, m, h):
     """
 

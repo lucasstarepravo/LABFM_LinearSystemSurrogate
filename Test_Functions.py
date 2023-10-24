@@ -34,7 +34,9 @@ def dif_analytical(nodes, derivative):
     result += 4 * var ** 3 * const ** 4
     result += 8 * var ** 7 * const ** 8
 
-    return result
+    result_dic = {(nodes.coordinates[i, 0], nodes.coordinates[i, 1]): result[i] for i in range(result.shape[0])}
+
+    return result_dic
 
 
 def laplace_phi(nodes):

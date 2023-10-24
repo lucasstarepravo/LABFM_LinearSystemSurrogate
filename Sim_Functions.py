@@ -63,3 +63,23 @@ def do_weights(m, abf, polynomial, d):
         w_dif[ref_node_i] = abf[ref_node_i] @ psi_w
 
     return w_dif
+
+
+def calc_l2(test_function, derivative):
+
+    if derivative not in ['dtdx', 'dtdy']:
+        raise ValueError("Invalid derivative type")
+
+    if derivative == 'dtdx':
+        dt_analy = test_function.dtdx_true
+        dt_aprox = test_function.dtdx_DO
+    elif derivative == 'dtdy':
+        dt_analy = test_function.dtdy_true
+        dt_aprox = test_function.dtdy_DO
+    #else:
+    #    dx_analy = test_function.laplace_true
+    #    dx_aprox = test_function.laplace_DO
+
+    l2 = np.array([(dt_analy[ref_node] - dt_aprox[ref_node]) ** 2 for ref_node in dt_aprox])
+    l2 = np.sqrt(np.sum(l2) / l2.size)
+    return l2
