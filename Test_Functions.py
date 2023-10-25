@@ -62,7 +62,9 @@ def laplace_phi(nodes):
     term12 = 56 * x ** 8 * y ** 6
     term13 = 56 * x ** 6 * y ** 8
 
-    return term1 + term2 + term3 + term4 + term5 + term6 + term7 + term8 + term9 + term10 + term11 + term12 + term13
+    result = term1 + term2 + term3 + term4 + term5 + term6 + term7 + term8 + term9 + term10 + term11 + term12 + term13
+    result_dic = {(nodes.coordinates[i, 0], nodes.coordinates[i, 1]): result[i] for i in range(result.shape[0])}
+    return result_dic
 
 
 def create_dict(array, coordinates, in_domain=None):
@@ -92,12 +94,14 @@ def dif_do(nodes, discrete_operator, surface_value, derivative):
     neigh = nodes.neighbours_coor
 
     if derivative not in ["dtdx", "dtdy", "Laplace"]:
-        raise ValueError("The valid_string argument must be 'dtdx', 'dtdy', or 'Laplace'")
+        raise ValueError("The valid_string argument must be 'dtdx', 'dtdy' or 'Laplace' ")
 
     if derivative == "dtdx":
         w_dif = discrete_operator.w_difX
     elif derivative == "dtdy":
         w_dif = discrete_operator.w_difY
+    elif derivative == 'Laplace':
+        w_dif = discrete_operator.w_Laplace
     # This calculates the approximation of the derivative
     dif_approx = {}
     for ref_node in w_dif:
@@ -108,15 +112,3 @@ def dif_do(nodes, discrete_operator, surface_value, derivative):
         dif_approx[ref_node] = np.dot(surface_dif, w_ref_node)
 
     return dif_approx
-
-
-
-def laplace_do(nodes, discrete_operator, surface_value):
-    """
-
-    :param nodes:
-    :param discrete_operator:
-    :param surface_value:
-    :return:
-    """
-    return

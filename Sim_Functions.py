@@ -24,7 +24,7 @@ def calc_h(s, polynomial):
 
 def calc_l2(test_function, derivative):
 
-    if derivative not in ['dtdx', 'dtdy']:
+    if derivative not in ['dtdx', 'dtdy', 'Laplace']:
         raise ValueError("Invalid derivative type")
 
     if derivative == 'dtdx':
@@ -33,9 +33,9 @@ def calc_l2(test_function, derivative):
     elif derivative == 'dtdy':
         dt_analy = test_function.dtdy_true
         dt_aprox = test_function.dtdy_DO
-    #else:
-    #    dx_analy = test_function.laplace_true
-    #    dx_aprox = test_function.laplace_DO
+    else:
+        dt_analy = test_function.laplace_true
+        dt_aprox = test_function.laplace_DO
 
     l2 = np.array([(dt_analy[ref_node] - dt_aprox[ref_node]) ** 2 for ref_node in dt_aprox])
     norm = np.sqrt(np.array([dt_analy[ref_node] ** 2 for ref_node in dt_analy]))

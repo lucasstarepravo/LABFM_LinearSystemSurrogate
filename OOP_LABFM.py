@@ -18,7 +18,7 @@ class Simulation:
         self.test_function     = TestFunction(self.nodes, self.discrete_operator)
         self.dtdx_l2           = calc_l2(self.test_function, 'dtdx')
         self.dtdy_l2           = calc_l2(self.test_function, 'dtdy')
-        # self.laplace_l2        = calc_l2(self.test_function, 'Laplace')
+        self.laplace_l2        = calc_l2(self.test_function, 'Laplace')
 
     def plot_neighbours(self, size=8):
         return show_neighbours(self.nodes, size)
@@ -53,10 +53,10 @@ class TestFunction:
         self.laplace_true  = laplace_phi(nodes)
         self.dtdx_DO       = dif_do(nodes, discrete_operator, self.surface_value, 'dtdx')
         self.dtdy_DO       = dif_do(nodes, discrete_operator, self.surface_value, 'dtdy')
-        #self.laplace_DO    = laplace_do(nodes, discrete_operator, self.surface_value, 'Laplace')
+        self.laplace_DO    = dif_do(nodes, discrete_operator, self.surface_value, 'Laplace')
 
 
-sim = Simulation(50, 6)
+sim = Simulation(50, 4)
 
 # To check matrix condition
 # import numpy as np
