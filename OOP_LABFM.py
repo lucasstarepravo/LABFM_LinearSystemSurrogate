@@ -56,7 +56,15 @@ class TestFunction:
         self.laplace_DO    = dif_do(nodes, discrete_operator, self.surface_value, 'Laplace')
 
 
-sim = Simulation(50, 4)
+total_nodes_list = [40, 40, 40, 50, 50, 50, 60, 60, 60]
+polynomial_list = [2, 4, 6, 2, 4, 6, 2, 4, 6]
+results = {}
+
+# Use a for loop to iterate over each combination of total_nodes and polynomial
+for total_nodes, polynomial in zip(total_nodes_list, polynomial_list):
+    sim = Simulation(total_nodes, polynomial)
+    results[(total_nodes, polynomial)] = sim
+
 
 # To check matrix condition
 # import numpy as np
