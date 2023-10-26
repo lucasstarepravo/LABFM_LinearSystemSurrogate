@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from Test_Functions import create_dict
 
 
 def show_neighbours(nodes, size):
@@ -65,3 +64,13 @@ def plot_weights(nodes, discrete_operator, size, derivative):
     plt.legend()
     plt.show()
     return
+
+
+'''def plot_l2(results, total_nodes_list, polynomial_list):
+    polynomials = set(polynomial_list)
+
+    for total_nodes, polynomial in zip(total_nodes_list, polynomial_list):
+        if polynomial == polynomials[0]:
+
+
+'''

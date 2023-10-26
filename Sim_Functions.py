@@ -13,7 +13,7 @@ def calc_h(s, polynomial):
     elif polynomial == 4:
         h = 1.5 * s
     elif polynomial == 6:
-        h = 2 * s
+        h = 2.5 * s
     elif polynomial == 8:
         h = 2.5 * s
     else:
@@ -38,6 +38,6 @@ def calc_l2(test_function, derivative):
         dt_aprox = test_function.laplace_DO
 
     l2 = np.array([(dt_analy[ref_node] - dt_aprox[ref_node]) ** 2 for ref_node in dt_aprox])
-    norm = np.sqrt(np.array([dt_analy[ref_node] ** 2 for ref_node in dt_analy]))
-    l2 = np.sqrt(np.sum(l2))/np.sum(norm)
+    norm = np.array([dt_analy[ref_node] ** 2 for ref_node in dt_analy])
+    l2 = np.sqrt(np.sum(l2))/np.sqrt(np.sum(norm))
     return l2

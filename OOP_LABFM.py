@@ -10,7 +10,7 @@ from Test_Functions import *
 class Simulation:
     def __init__(self, total_nodes, polynomial):
         self.total_nodes       = total_nodes
-        self.s                 = 1.0 / (total_nodes - 1)
+        self.s                 = 1.0 / total_nodes
         self.polynomial        = polynomial
         self.h                 = calc_h(self.s, self.polynomial)
         self.nodes             = Nodes(self.total_nodes, self.s, self.h, self.polynomial)
@@ -56,16 +56,11 @@ class TestFunction:
         self.laplace_DO    = dif_do(nodes, discrete_operator, self.surface_value, 'Laplace')
 
 
-total_nodes_list = [40, 40, 40, 50, 50, 50, 60, 60, 60]
-polynomial_list = [2, 4, 6, 2, 4, 6, 2, 4, 6]
+total_nodes_list = [50, 50, 50]
+polynomial_list = [2, 4, 6]
 results = {}
 
 # Use a for loop to iterate over each combination of total_nodes and polynomial
 for total_nodes, polynomial in zip(total_nodes_list, polynomial_list):
     sim = Simulation(total_nodes, polynomial)
     results[(total_nodes, polynomial)] = sim
-
-
-# To check matrix condition
-# import numpy as np
-# np.linalg.cond(sim.discrete_operator.M[0])

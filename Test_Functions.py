@@ -9,7 +9,7 @@ def test_function(nodes):
 
     x = nodes.coordinates[:, 0] - .1453
     y = nodes.coordinates[:, 1] - .16401
-    phi = 1 + (x * y) ** 4 + (x * y) ** 8 + x ** 2 + y ** 2 + sum([x ** n + y ** n for n in range(1, 7)])
+    phi = 1 + (x * y) ** 4 + (x * y) ** 8 + (x + y) + (x ** 2 + y ** 2) + (x ** 3 + y ** 3) + (x ** 4 + y ** 4) + (x ** 5 + y ** 5) + (x ** 6 + y ** 6)
     phi_dict = {(nodes.coordinates[i, 0], nodes.coordinates[i, 1]): phi[i] for i in range(phi.shape[0])}
     return phi_dict
 
@@ -28,12 +28,7 @@ def dif_analytical(nodes, derivative):
     const = nodes.coordinates[:, 1] - .16401 if derivative == 'dtdx' else nodes.coordinates[:, 0] - .1453
 
     # Calculate the terms using a loop
-    result = sum((i + 1) * var ** i for i in range(6))
-
-    # Add the additional terms
-    result += 4 * var ** 3 * const ** 4
-    result += 8 * var ** 7 * const ** 8
-
+    result = 4 * var ** 3 * const ** 4 + 8 * var ** 7 * const ** 8 + 1 + 2 * var + 3 * var ** 2 + 4 * var ** 3  + 5 * var ** 4 + 6 * var ** 5
     result_dic = {(nodes.coordinates[i, 0], nodes.coordinates[i, 1]): result[i] for i in range(result.shape[0])}
 
     return result_dic
@@ -65,22 +60,6 @@ def laplace_phi(nodes):
     result = term1 + term2 + term3 + term4 + term5 + term6 + term7 + term8 + term9 + term10 + term11 + term12 + term13
     result_dic = {(nodes.coordinates[i, 0], nodes.coordinates[i, 1]): result[i] for i in range(result.shape[0])}
     return result_dic
-
-
-def create_dict(array, coordinates, in_domain=None):
-    output = {}
-
-    if in_domain is None:
-        return {(coordinates[i, 0], coordinates[i, 1]): array[i] for i in range(len(array))}
-    else:
-        index = 0
-        for i in range(len(coordinates)):
-            if in_domain[i] is False:
-                continue
-            else:
-                output[(coordinates[i, 0], coordinates[i, 1])] = array[index]
-                index = index + 1
-        return output
 
 
 def dif_do(nodes, discrete_operator, surface_value, derivative):

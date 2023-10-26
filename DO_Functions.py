@@ -30,7 +30,6 @@ def monomial_power(polynomial):
     return np.array(monomial_exponent)
 
 
-# This is the first function that ignore the Nodes without neighbours
 def calc_monomial(nodes, m, h):
     """
 
@@ -50,8 +49,8 @@ def calc_monomial(nodes, m, h):
             index1 = 0
             monomials[key1] = np.zeros((len(neighbours[key1]), len(m_power)))
             for power_x, power_y in m_power:
-                monomials[key1][:, index1] = np.array(neighbours[key1])[:, 0] ** power_x * \
-                                             np.array(neighbours[key1])[:, 1] ** power_y
+                monomials[key1][:, index1] = (np.array(neighbours[key1])[:, 0] ** power_x * np.array(neighbours[key1])[:, 1] ** power_y) / (
+                                                     math.factorial(power_x) * math.factorial(power_y))
                 index1 = index1 + 1
 
     scaling_v = scaling_matrix(m_power, h).reshape(-1, 1)
@@ -77,10 +76,10 @@ def calc_hp(exp_a, coordinates, h):
 
     z = coordinates / (h * (2 ** .5))
 
-    if exp_a == 0:  # # This equation only works for n = 2 (i.e. m = 1)
+    if exp_a == 0:
         h = 1
 
-    elif exp_a == 1:  # This equation only works for n = 5 (i.e. m = 2)
+    elif exp_a == 1:
         h = 2 * z
 
     elif exp_a == 2:
@@ -132,18 +131,18 @@ def gaussian_rbf(neighbours_r, h):
     return w_ji
 
 
-def calc_abf(nodes, h, m):  # Needs to be written
+def calc_abf(nodes, h, polynomial):  # Needs to be written
     """
 
+    :param polynomial:
     :param nodes:
     :param h:
-    :param m: is the order of the high order polynomial we chose to approximate
     :return:
     """
     neigh_r = nodes.neighbours_r
     neigh_xy = nodes.neighbours_xy
     basis_func = {}
-    m_power = monomial_power(m)
+    m_power = monomial_power(polynomial)
     n = len(m_power)
 
     for ref_node in neigh_r:
@@ -154,9 +153,10 @@ def calc_abf(nodes, h, m):  # Needs to be written
             for j in range(len(neigh_r[ref_node])):
                 w_jid = []
                 for k in range(n):
-                    w_jid.append(gaussian_rbf(neigh_r[ref_node][j], h) / ((2 ** (m_power[k, 0] + m_power[k, 1])) ** .5) * \
-                                 calc_hp(m_power[k, 0], neigh_xy[ref_node][j][0], h) * \
-                                 calc_hp(m_power[k, 1], neigh_xy[ref_node][j][1], h))
+                    w_jid.append(
+                        gaussian_rbf(neigh_r[ref_node][j], h) / ((2 ** (m_power[k, 0] + m_power[k, 1])) ** .5) * \
+                        calc_hp(m_power[k, 0], neigh_xy[ref_node][j][0], h) * \
+                        calc_hp(m_power[k, 1], neigh_xy[ref_node][j][1], h))
                 basis_func[ref_node][j, :] = np.array(w_jid)
 
     return basis_func
@@ -170,13 +170,13 @@ def calc_m(basis_func, monomial):
     :return:
     """
     m = {}
-    for i in basis_func:
-        if basis_func[i] is None:
-            m[i] = None
+    for ref_node in basis_func:
+        if basis_func[ref_node] is None:
+            m[ref_node] = None
         else:
-            m[i] = np.zeros((basis_func[i].shape[1], monomial[i].shape[1]))
-            for j in range(len(basis_func[i])):
-                m[i] = m[i] + np.outer(monomial[i][j], basis_func[i][j])
+            m[ref_node] = np.zeros((basis_func[ref_node].shape[1], monomial[ref_node].shape[1]))
+            for j in range(len(basis_func[ref_node])):
+                m[ref_node] = m[ref_node] + np.outer(monomial[ref_node][j], basis_func[ref_node][j])
 
     return m
 
@@ -199,8 +199,8 @@ def pointing_v(polynomial, d):
     elif d == 'y':
         cd[1] = 1
     elif d == 'Laplace':
-        cd[2] = 2
-        cd[4] = 4
+        cd[2] = 1
+        cd[4] = 1
     return cd
 
 
@@ -212,7 +212,6 @@ def do_weights(m, abf, polynomial, h, derivative):
     :param m:
     :param abf:
     :param polynomial:
-    :param d:
     :return:
     """
     w_dif = {}
@@ -221,12 +220,12 @@ def do_weights(m, abf, polynomial, h, derivative):
     scaling_v = scaling_matrix(m_power, h).reshape(-1, 1)
     cd = cd * scaling_v
 
-    for ref_node_i in m:
-        if m[ref_node_i] is None:
-            w_dif[ref_node_i] = None
+    for ref_node in m:
+        if m[ref_node] is None:
+            w_dif[ref_node] = None
         else:
-            w_dif[ref_node_i] = np.zeros((abf[ref_node_i].shape[0], 1))
-            psi_w = np.linalg.solve(m[ref_node_i], cd)
-            w_dif[ref_node_i] = abf[ref_node_i] @ psi_w
+            w_dif[ref_node] = np.zeros((abf[ref_node].shape[0], 1))
+            psi_w = np.linalg.solve(m[ref_node], cd)
+            w_dif[ref_node] = abf[ref_node] @ psi_w
 
     return w_dif
