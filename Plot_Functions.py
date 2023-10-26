@@ -59,7 +59,7 @@ def plot_weights(nodes, discrete_operator, size, derivative):
     ref_weights = np.delete(ref_weights, index_to_delete[0])
 
     plt.scatter(ref_node[0], ref_node[1], c='black', label='Reference Node', s=size)
-    plt.scatter(ref_neigh[:, 0], ref_neigh[:, 1], c=ref_weights, label='Neighbour nodes', s=size, cmap='brg')
+    plt.scatter(ref_neigh[:, 0], ref_neigh[:, 1], c=np.log(ref_weights), label='Neighbour nodes', s=size, cmap='brg')
     plt.colorbar()
     plt.legend()
     plt.show()
