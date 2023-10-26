@@ -1,3 +1,5 @@
+from typing import Dict, Tuple, Any
+
 from Nodes_Functions import *
 from DO_Functions import *
 from Sim_Functions import *
@@ -56,11 +58,14 @@ class TestFunction:
         self.laplace_DO    = dif_do(nodes, discrete_operator, self.surface_value, 'Laplace')
 
 
+def run_simulation(total_nodes_list, polynomial_list):
+    result = {}
+    for total_nodes, polynomial in zip(total_nodes_list, polynomial_list):
+        sim = Simulation(total_nodes, polynomial)
+        result[(total_nodes, polynomial)] = sim
+    return result
+
+
 total_nodes_list = [10, 10, 10, 50, 50, 50]
 polynomial_list = [2, 4, 6, 2, 4, 6]
-results = {}
-
-# Use a for loop to iterate over each combination of total_nodes and polynomial
-for total_nodes, polynomial in zip(total_nodes_list, polynomial_list):
-    sim = Simulation(total_nodes, polynomial)
-    results[(total_nodes, polynomial)] = sim
+results = run_simulation(total_nodes_list, polynomial_list)
