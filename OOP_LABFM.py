@@ -23,7 +23,7 @@ class Simulation:
     def plot_neighbours(self, size=8):
         return show_neighbours(self.nodes, size)
 
-    def plot_weights(self, size=10, derivative='dtdx'):
+    def plot_weights(self, size=80, derivative='dtdx'):
         return plot_weights(self.nodes, self.discrete_operator, size, derivative)
 
 
@@ -56,8 +56,8 @@ class TestFunction:
         self.laplace_DO    = dif_do(nodes, discrete_operator, self.surface_value, 'Laplace')
 
 
-total_nodes_list = [50, 50, 50]
-polynomial_list = [2, 4, 6]
+total_nodes_list = [10, 10, 10, 50, 50, 50]
+polynomial_list = [2, 4, 6, 2, 4, 6]
 results = {}
 
 # Use a for loop to iterate over each combination of total_nodes and polynomial
