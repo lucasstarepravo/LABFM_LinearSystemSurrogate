@@ -64,8 +64,8 @@ def run(total_nodes_list, polynomial_list):
         result[(total_nodes, polynomial)] = sim
     return result
 
+
 if __name__ == "__main__":
     total_nodes_list = [10, 10, 10, 50, 50, 50]
     polynomial_list = [2, 4, 6, 2, 4, 6]
     results = run(total_nodes_list, polynomial_list)
-
