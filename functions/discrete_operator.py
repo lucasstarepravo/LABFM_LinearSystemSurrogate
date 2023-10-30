@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from nodes import neighbour_nodes
+from functions.nodes import neighbour_nodes
 from tqdm import tqdm
 
 
