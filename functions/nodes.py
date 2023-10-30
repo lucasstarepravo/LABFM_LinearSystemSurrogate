@@ -11,7 +11,7 @@ def calc_h(s, polynomial):
     if polynomial == 2:
         h = 1.2 * s
     elif polynomial == 4:
-        h = 1.5 * s
+        h = 1.8 * s
     elif polynomial == 6:
         h = 2.3 * s
     elif polynomial == 8:
