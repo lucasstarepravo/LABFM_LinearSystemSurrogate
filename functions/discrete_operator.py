@@ -65,6 +65,7 @@ def gaussian_rbf(neighbours_r, h):
 def calc_hp(exp_a, dist_xy, h):
     """
     This function gives the first 10 expansions of the Hermite polynomial
+    :param dist_xy:
     :param exp_a:
     :param h:
     :return:
@@ -115,8 +116,9 @@ def calc_hp(exp_a, dist_xy, h):
 def calc_abf(neigh_r, neigh_xy, m_power, h):  # Needs to be written
     """
 
-    :param polynomial:
-    :param nodes:
+    :param m_power:
+    :param neigh_xy:
+    :param neigh_r:
     :param h:
     :return:
     """
@@ -170,7 +172,7 @@ def pointing_v(polynomial, d):
     return cd
 
 
-def calc_weights(coordinates, polynomial, h):
+def calc_weights(coordinates, polynomial, h, total_nodes):
     """
 
     :param coordinates:
@@ -184,25 +186,25 @@ def calc_weights(coordinates, polynomial, h):
     weights_laplace = {}
 
     neigh_coor_dict = {}
-    for ref_x, ref_y in tqdm(coordinates, desc="Calculating Weights", ncols=100):
+    for ref_x, ref_y in tqdm(coordinates, desc="Calculating Weights for " + str(total_nodes) + ", " + str(polynomial), ncols=100):
         if ref_x > 1 or ref_x < 0 or ref_y > 1 or ref_y < 0:
             continue
         else:
-            ref_node = (ref_x, ref_y)
+            ref_node            = (ref_x, ref_y)
             neigh_r_d, neigh_xy_d, neigh_coor_dict[ref_node] = neighbour_nodes(coordinates, ref_node, h)
-            monomial_exponent = monomial_power(polynomial)
-            scaling_vector = calc_scaling_vector(monomial_exponent, h)
-            monomial = calc_monomial(neigh_xy_d, polynomial, h) * scaling_vector.T
-            basis_func = calc_abf(neigh_r_d, neigh_xy_d, monomial_exponent, h)
-            m_matrix = calc_m(basis_func, monomial)
-            cd_x = pointing_v(polynomial, 'x')
-            cd_y = pointing_v(polynomial, 'y')
-            cd_laplace = pointing_v(polynomial, 'Laplace')
-            psi_w_x = np.linalg.solve(m_matrix, cd_x * scaling_vector)
-            psi_w_y = np.linalg.solve(m_matrix, cd_y * scaling_vector)
-            psi_w_laplace = np.linalg.solve(m_matrix, cd_laplace * scaling_vector)
-            node_weight_x = basis_func @ psi_w_x
-            node_weight_y = basis_func @ psi_w_y
+            monomial_exponent   = monomial_power(polynomial)
+            scaling_vector      = calc_scaling_vector(monomial_exponent, h)
+            monomial            = calc_monomial(neigh_xy_d, polynomial, h) * scaling_vector.T
+            basis_func          = calc_abf(neigh_r_d, neigh_xy_d, monomial_exponent, h)
+            m_matrix            = calc_m(basis_func, monomial)
+            cd_x                = pointing_v(polynomial, 'x')
+            cd_y                = pointing_v(polynomial, 'y')
+            cd_laplace          = pointing_v(polynomial, 'Laplace')
+            psi_w_x             = np.linalg.solve(m_matrix, cd_x * scaling_vector)
+            psi_w_y             = np.linalg.solve(m_matrix, cd_y * scaling_vector)
+            psi_w_laplace       = np.linalg.solve(m_matrix, cd_laplace * scaling_vector)
+            node_weight_x       = basis_func @ psi_w_x
+            node_weight_y       = basis_func @ psi_w_y
             node_weight_laplace = basis_func @ psi_w_laplace
             weights_x[ref_node] = node_weight_x
             weights_y[ref_node] = node_weight_y
