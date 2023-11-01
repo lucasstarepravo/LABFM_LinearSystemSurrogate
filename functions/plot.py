@@ -35,8 +35,7 @@ def show_neighbours(coordinates, weights, size):
     return
 
 
-def plot_weights(coordinates10, weights, discrete_operator, size, derivative):
-    coordinates = coordinates10
+def plot_weights(coordinates, weights, size, derivative):
     while True:
         sample = coordinates[np.random.choice(coordinates.shape[0])]
         if 0 <= sample[0] <= 1 and 0 <= sample[1] <= 1:
@@ -63,13 +62,3 @@ def plot_weights(coordinates10, weights, discrete_operator, size, derivative):
     plt.legend()
     plt.show()
     return
-
-
-'''def plot_l2(results, total_nodes_list, polynomial_list):
-    polynomials = set(polynomial_list)
-
-    for total_nodes, polynomial in zip(total_nodes_list, polynomial_list):
-        if polynomial == polynomials[0]:
-
-
-'''
