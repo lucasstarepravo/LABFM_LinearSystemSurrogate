@@ -184,8 +184,11 @@ def calc_weights(coordinates, polynomial, h, total_nodes):
     weights_x = {}
     weights_y = {}
     weights_laplace = {}
-
     neigh_coor_dict = {}
+    cd_x = pointing_v(polynomial, 'x')
+    cd_y = pointing_v(polynomial, 'y')
+    cd_laplace = pointing_v(polynomial, 'Laplace')
+
     for ref_x, ref_y in tqdm(coordinates, desc="Calculating Weights for " + str(total_nodes) + ", " + str(polynomial), ncols=100):
         if ref_x > 1 or ref_x < 0 or ref_y > 1 or ref_y < 0:
             continue
@@ -197,9 +200,6 @@ def calc_weights(coordinates, polynomial, h, total_nodes):
             monomial            = calc_monomial(neigh_xy_d, polynomial, h) * scaling_vector.T
             basis_func          = calc_abf(neigh_r_d, neigh_xy_d, monomial_exponent, h)
             m_matrix            = calc_m(basis_func, monomial)
-            cd_x                = pointing_v(polynomial, 'x')
-            cd_y                = pointing_v(polynomial, 'y')
-            cd_laplace          = pointing_v(polynomial, 'Laplace')
             psi_w_x             = np.linalg.solve(m_matrix, cd_x * scaling_vector)
             psi_w_y             = np.linalg.solve(m_matrix, cd_y * scaling_vector)
             psi_w_laplace       = np.linalg.solve(m_matrix, cd_laplace * scaling_vector)
