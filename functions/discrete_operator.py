@@ -128,8 +128,8 @@ def calc_abf(neigh_r, neigh_xy, m_power, h):  # Needs to be written
     for index, (x_dist, y_dist) in enumerate(neigh_xy):
         row = []
         rbf = gaussian_rbf(neigh_r[index], h)
-        for power_x, power_y in m_power:
-            temp_variable = rbf / ((2 ** (power_x + power_y)) ** .5) * calc_hp(power_x, x_dist, h) * calc_hp(power_y,
+        for power_a, power_b in m_power:
+            temp_variable = (rbf / ((2 ** (power_a + power_b)) ** .5)) * calc_hp(power_a, x_dist, h) * calc_hp(power_b,
                                                                                                              y_dist, h)
             row.append(temp_variable)
         basis_func.append(row)

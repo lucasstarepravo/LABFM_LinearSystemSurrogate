@@ -9,6 +9,7 @@ def plot_convergence(results, size=20):
     poly2 = {k: v for k, v in results.items() if k[1] == 2}
     poly4 = {k: v for k, v in results.items() if k[1] == 4}
     poly6 = {k: v for k, v in results.items() if k[1] == 6}
+    poly8 = {k: v for k, v in results.items() if k[1] == 8}
 
     # DTDX
     dtdx2_l2 = []
@@ -35,9 +36,19 @@ def plot_convergence(results, size=20):
     s6 = np.array(s6)
     dtdx6_l2 = np.array(dtdx6_l2)
 
+
+    dtdx8_l2 = []
+    s8 = []
+    for tup in list(poly8.keys()):
+        s8.append(1 / tup[0])
+        dtdx8_l2.append(poly8[tup].dtdx_l2)
+    s8 = np.array(s8)
+    dtdx8_l2 = np.array(dtdx8_l2)
+
     plt.scatter(s2, dtdx2_l2, c='blue', label='Polynomial = 2', s=size)
     plt.scatter(s4, dtdx4_l2, c='red', label='Polynomial = 4', s=size)
     plt.scatter(s6, dtdx6_l2, c='green', label='Polynomial = 6', s=size)
+    plt.scatter(s8, dtdx8_l2, c='black', label='Polynomial = 8', s=size)
     plt.xlabel('X-coordinate')
     plt.ylabel('Y-coordinate')
     plt.title('Convergence of dtdx')
@@ -51,8 +62,8 @@ def plot_convergence(results, size=20):
 
 
 if __name__ == '__main__':
-    total_nodes_list = [10, 10, 10]
-    polynomial_list = [2, 4, 6]
+    total_nodes_list = [10, 10, 10, 10, 20, 20, 20, 20]
+    polynomial_list = [2, 4, 6, 8, 2, 4, 6, 8]
     results = run(total_nodes_list, polynomial_list)
 
 
