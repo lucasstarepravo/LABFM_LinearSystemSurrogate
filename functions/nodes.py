@@ -2,14 +2,9 @@ import numpy as np
 import random
 
 
-def random_numbers(seed, length, s):
+def random_matrix(seed, shape, s):
     random.seed(seed)
-    return np.array([round(random.uniform(0, s/4), 7) for _ in range(length)])
-
-
-def random_one(seed, length):
-    random.seed(seed)
-    return np.array([random.choice([1, -1]) for _ in range(length)])
+    return np.array([[random.uniform(-s/4, s/4) for _ in range(shape[1])] for _ in range(shape[0])])
 
 
 def calc_h(s, polynomial):
@@ -22,7 +17,7 @@ def calc_h(s, polynomial):
     if polynomial == 2:
         h = 1.2 * s
     elif polynomial == 4:
-        h = 1.5 * s
+        h = 1.6 * s
     elif polynomial == 6:
         h = 1.9 * s
     elif polynomial == 8:
@@ -50,16 +45,14 @@ def create_nodes(total_nodes, s, polynomial):
     X, Y = np.meshgrid(x, y)  # Create a 2D grid of x and y coordinates
 
     # Perturb the coordinates
-    shift_x = random_numbers(1, X.shape[0], s)
-    direction_x = random_one(1, X.shape[0])
-    shift_y = random_numbers(2, Y.shape[0], s)
-    direction_y = random_one(2, Y.shape[0])
-    X = X + direction_x * shift_x
-    Y = Y + direction_y * shift_y
+    shift_x = random_matrix(1, X.shape, s)
+    shift_y = random_matrix(2, Y.shape, s)
+    X = X + shift_x
+    Y = Y + shift_y
 
     # Stack the perturbed coordinates
     coordinates = np.column_stack((X.ravel(), Y.ravel()))
-    coordinates = np.around(coordinates, 11)
+    coordinates = np.around(coordinates, 15)
 
     return coordinates
 
@@ -73,9 +66,9 @@ def neighbour_nodes(coordinates, ref_node, h):
     for index, (x_j, y_j) in enumerate(coordinates):
         distance = ((x_j - ref_node[0]) ** 2 + (y_j - ref_node[1]) ** 2) ** 0.5
         if distance <= 2 * h:
-            neigh_r_d.append([round(distance, 11)])
-            neigh_xy_d.append([round(x_j - ref_node[0], 11), round(y_j - ref_node[1], 11)])
-            neigh_coor.append([round(x_j, 11), round(y_j, 11)])
+            neigh_r_d.append([distance])
+            neigh_xy_d.append([x_j - ref_node[0], y_j - ref_node[1]])
+            neigh_coor.append([x_j, y_j])
         else:
             continue
     return np.array(neigh_r_d), np.array(neigh_xy_d), np.array(neigh_coor)
