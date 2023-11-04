@@ -25,8 +25,13 @@ def dif_analytical(coordinates, derivative):
         raise ValueError("Invalid derivative type")
 
     # Determine the variable of interest based on the derivative
-    var = coordinates[:, 0] - .1453 if derivative == 'dtdx' else coordinates[:, 1] - .16401
-    const = coordinates[:, 1] - .16401 if derivative == 'dtdx' else coordinates[:, 0] - .1453
+    if derivative == 'dtdx':
+        var = coordinates[:, 0] - .1453
+        const = coordinates[:, 1] - .16401
+    else:
+        var = coordinates[:, 1] - .16401
+        const = coordinates[:, 0] - .1453
+
 
     # Calculate the terms using a loop
     result = 4 * var ** 3 * const ** 4 + 8 * var ** 7 * const ** 8 + 1 + 2 * var + 3 * var ** 2 + 4 * var ** 3 + 5 * var ** 4 + 6 * var ** 5
@@ -63,8 +68,7 @@ def laplace_phi(coordinates):
 
 def dif_do(weights, surface_value, derivative):
     """
-    :param nodes:
-    :param discrete_operator:
+    :param weights:
     :param surface_value:
     :param derivative:
     :return:
@@ -83,9 +87,9 @@ def dif_do(weights, surface_value, derivative):
         w_dif = weights.laplace
     # This calculates the approximation of the derivative
     dif_approx = {}
-    for ref_node in w_dif:
+    for ref_node in neigh:
         surface_dif = np.array([surface_value[tuple(n_node)] - surface_value[tuple(ref_node)] for n_node in neigh[ref_node]]).reshape(1,-1)
-        w_ref_node  = w_dif[ref_node].reshape(-1, 1)
+        w_ref_node  = w_dif[ref_node]
         dif_approx[ref_node] = np.dot(surface_dif, w_ref_node)
 
     return dif_approx
