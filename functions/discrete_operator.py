@@ -128,15 +128,16 @@ def calc_abf(neigh_r, neigh_xy, m_power, h):  # Needs to be written
     :param h:
     :return:
     """
-
     basis_func = []
 
     for index, (x_dist, y_dist) in enumerate(neigh_xy):
         row = []
-        rbf = gaussian_rbf(neigh_r[index], h)
-        for power_x, power_y in m_power:
-            temp_variable = rbf / ((2 ** (power_x + power_y)) ** .5) * calc_hp(power_x, x_dist, h) * calc_hp(power_y,
-                                                                                                             y_dist, h)
+        rbf = wendland_rbf(neigh_r[index], h)
+        for power_a, power_b in m_power:
+            h_a = calc_hp(power_a, x_dist, h)
+            h_b = calc_hp(power_b, y_dist, h)
+            two_power = 2 ** (power_a + power_b)
+            temp_variable = rbf / (two_power ** .5) * h_a * h_b
             row.append(temp_variable)
         basis_func.append(row)
     return np.array(basis_func)
