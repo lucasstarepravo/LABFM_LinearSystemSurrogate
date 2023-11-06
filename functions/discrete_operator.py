@@ -32,9 +32,8 @@ def calc_scaling_vector(monomial_exponent, h):
     return scaling_m
 
 
-def calc_monomial(neigh_xy_d, polynomial, h):
+def calc_monomial(neigh_xy_d, polynomial, mon_power):
     neigh_xy_d = neigh_xy_d
-    mon_power = monomial_power(polynomial)
     monomial = []
     for index, (x_dist, y_dist) in enumerate(neigh_xy_d):
         row = []
@@ -44,7 +43,7 @@ def calc_monomial(neigh_xy_d, polynomial, h):
             row.append(temp_variable)
         monomial.append(row)
     monomial = np.array(monomial)
-    return monomial
+    return monomial.T
 
 
 def gaussian_rbf(neighbours_r, h):
@@ -63,7 +62,9 @@ def gaussian_rbf(neighbours_r, h):
 
 
 def wendland_rbf(neighbours_r, h):
+
     q = neighbours_r/h
+
     w_ji = (78/(28 * math.pi))*(1-q/2) ** 8 * (4*q**3 + 6.35 * q ** 2 + 4 * q + 1)
     return float(w_ji)
 
@@ -150,9 +151,9 @@ def calc_m(basis_func, monomial):
     :param basis_func:
     :return:
     """
-    m_matrix = np.zeros((basis_func.shape[1], monomial.shape[1]))
+    m_matrix = np.zeros((basis_func.shape[1], monomial.shape[0]))
     for j in range(len(basis_func)):
-        m_matrix = m_matrix + np.outer(monomial[j], basis_func[j])
+        m_matrix = m_matrix + np.outer(monomial[:,j], basis_func[j])
     return m_matrix
 
 
@@ -192,9 +193,15 @@ def calc_weights(coordinates, polynomial, h, total_nodes):
     weights_y = {}
     weights_laplace = {}
     neigh_coor_dict = {}
+
+    monomial_exponent = monomial_power(polynomial)
+    scaling_vector = calc_scaling_vector(monomial_exponent, h)
     cd_x = pointing_v(polynomial, 'x')
+    cd_x = cd_x * scaling_vector
     cd_y = pointing_v(polynomial, 'y')
+    cd_y = cd_y * scaling_vector
     cd_laplace = pointing_v(polynomial, 'Laplace')
+    cd_laplace = cd_laplace * scaling_vector
 
     for ref_x, ref_y in tqdm(coordinates, desc="Calculating Weights for " + str(total_nodes) + ", " + str(polynomial), ncols=100):
         if ref_x > 1 or ref_x < 0 or ref_y > 1 or ref_y < 0:
@@ -202,17 +209,15 @@ def calc_weights(coordinates, polynomial, h, total_nodes):
         else:
             ref_node            = (ref_x, ref_y)
             neigh_r_d, neigh_xy_d, neigh_coor_dict[ref_node] = neighbour_nodes(coordinates, ref_node, h)
-            monomial_exponent   = monomial_power(polynomial)
-            scaling_vector      = calc_scaling_vector(monomial_exponent, h)
-            monomial            = calc_monomial(neigh_xy_d, polynomial, h) * scaling_vector.T
+            monomial            = calc_monomial(neigh_xy_d, polynomial, monomial_exponent) * scaling_vector
             basis_func          = calc_abf(neigh_r_d, neigh_xy_d, monomial_exponent, h)
             m_matrix            = calc_m(basis_func, monomial)
-            psi_w_x             = np.linalg.solve(m_matrix, cd_x * scaling_vector)
-            psi_w_y             = np.linalg.solve(m_matrix, cd_y * scaling_vector)
-            psi_w_laplace       = np.linalg.solve(m_matrix, cd_laplace * scaling_vector)
-            node_weight_x       = basis_func @ psi_w_x
-            node_weight_y       = basis_func @ psi_w_y
-            node_weight_laplace = basis_func @ psi_w_laplace
+            psi_x               = np.linalg.solve(m_matrix, cd_x)
+            psi_y               = np.linalg.solve(m_matrix, cd_y)
+            psi_laplace         = np.linalg.solve(m_matrix, cd_laplace)
+            node_weight_x       = basis_func @ psi_x
+            node_weight_y       = basis_func @ psi_y
+            node_weight_laplace = basis_func @ psi_laplace
             weights_x[ref_node] = node_weight_x
             weights_y[ref_node] = node_weight_y
             weights_laplace[ref_node] = node_weight_laplace
@@ -234,7 +239,14 @@ def calc_l2(test_function, derivative):
         dt_analy = test_function.laplace_true
         dt_aprox = test_function.laplace_approx
 
-    l2 = np.array([(dt_analy[ref_node] - dt_aprox[ref_node]) ** 2 for ref_node in dt_aprox])
-    norm = np.array([dt_analy[ref_node] ** 2 for ref_node in dt_analy])
-    l2 = np.sqrt(np.sum(l2)) / np.sqrt(np.sum(norm))
+    error = []
+    norm = []
+
+
+    for ref_node in dt_aprox:
+        error.append((dt_analy[ref_node] - dt_aprox[ref_node]) ** 2)
+        norm.append(dt_analy[ref_node] ** 2)
+
+    l2 = np.sqrt(sum(error)) / np.sqrt(sum(norm))
+
     return l2
