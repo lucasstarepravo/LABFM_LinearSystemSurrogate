@@ -62,6 +62,12 @@ def gaussian_rbf(neighbours_r, h):
     return w_ji
 
 
+def wendland_rbf(neighbours_r, h):
+    q = neighbours_r/h
+    w_ji = (78/(28 * math.pi))*(1-q/2) ** 8 * (4*q**3 + 6.35 * q ** 2 + 4 * q + 1)
+    return float(w_ji)
+
+
 def calc_hp(exp_a, dist_xy, h):
     """
     This function gives the first 10 expansions of the Hermite polynomial
