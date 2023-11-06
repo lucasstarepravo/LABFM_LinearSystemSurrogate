@@ -131,8 +131,8 @@ def plot_convergence(results, derivative='dtdx', size=20):
 
 
 if __name__ == '__main__':
-    total_nodes_list = [20, 20, 20, 20, 50, 50, 50, 50, 100, 100, 100, 100, 200, 200, 200, 200]
-    polynomial_list = [2, 4, 6, 8, 2, 4, 6, 8, 2, 4, 6, 8, 2, 4, 6, 8]
+    total_nodes_list = [10, 10, 10, 10, 20, 20, 20, 20, 50, 50, 50, 50]
+    polynomial_list = [2, 4, 6, 8, 2, 4, 6, 8, 2, 4, 6, 8]
     results = run(total_nodes_list, polynomial_list)
 
 
