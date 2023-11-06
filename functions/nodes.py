@@ -15,13 +15,13 @@ def calc_h(s, polynomial):
     :return:
     """
     if polynomial == 2:
-        h = 1.2 * s
+        h = 1.3 * s
     elif polynomial == 4:
-        h = 1.6 * s
-    elif polynomial == 6:
         h = 1.9 * s
+    elif polynomial == 6:
+        h = 2.3 * s
     elif polynomial == 8:
-        h = 2.5 * s
+        h = 2.7 * s
     else:
         raise ValueError("The polynomial argument must be 2, 4, 6, or 8")
 
