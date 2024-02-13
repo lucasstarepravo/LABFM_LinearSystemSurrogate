@@ -57,8 +57,7 @@ def create_nodes(total_nodes, s, polynomial):
     return coordinates
 
 
-def neighbour_nodes(coordinates, ref_node, h):
-
+def neighbour_nodes(coordinates, ref_node, h, max_neighbors=None):
     neigh_r_d = []
     neigh_xy_d = []
     neigh_coor = []
@@ -66,9 +65,22 @@ def neighbour_nodes(coordinates, ref_node, h):
     for index, (x_j, y_j) in enumerate(coordinates):
         distance = ((x_j - ref_node[0]) ** 2 + (y_j - ref_node[1]) ** 2) ** 0.5
         if distance <= 2 * h:
-            neigh_r_d.append([distance])
+            neigh_r_d.append(distance)
             neigh_xy_d.append([x_j - ref_node[0], y_j - ref_node[1]])
             neigh_coor.append([x_j, y_j])
-        else:
-            continue
-    return np.array(neigh_r_d), np.array(neigh_xy_d), np.array(neigh_coor)
+
+    # Combine lists into a single list of tuples for sorting
+    combined_list = list(zip(neigh_r_d, neigh_xy_d, neigh_coor))
+
+    # Sort the combined list by radial distance
+    sorted_combined_list = sorted(combined_list, key=lambda x: x[0])
+
+    # If max_neighbors is specified and less than the number of found neighbors, slice the lists
+    if max_neighbors is not None and max_neighbors < len(sorted_combined_list):
+        sorted_combined_list = sorted_combined_list[:max_neighbors]
+
+    # Unzip the potentially sliced list into individual lists
+    neigh_r_d, neigh_xy_d, neigh_coor = zip(*sorted_combined_list) if sorted_combined_list else ([], [], [])
+
+    # Convert lists to numpy arrays for consistency with your return statement
+    return np.array(list(neigh_r_d)), np.array(list(neigh_xy_d)), np.array(list(neigh_coor))
