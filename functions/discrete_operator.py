@@ -60,11 +60,17 @@ def gaussian_rbf(neighbours_r, h):
     return w_ji
 
 
-def wendland_rbf(neighbours_r, h):
+def wendland_rbf_c6(neighbours_r, h):
 
     q = neighbours_r/h
 
     w_ji = (78/(28 * math.pi))*(1-q/2) ** 8 * (4*q**3 + 6.35 * q ** 2 + 4 * q + 1)
+    return float(w_ji)
+
+
+def wendland_rbf_c2(neighbours_r, h):
+    q = neighbours_r/h
+    w_ji = ((7/(4 * math.pi)) * (2 * q + 1) * 4 * (1 - q/2))
     return float(w_ji)
 
 
@@ -132,7 +138,7 @@ def calc_abf(neigh_r, neigh_xy, m_power, h):  # Needs to be written
 
     for index, (x_dist, y_dist) in enumerate(neigh_xy):
         row = []
-        rbf = wendland_rbf(neigh_r[index], h)
+        rbf = wendland_rbf_c2(neigh_r[index], h)
         for power_a, power_b in m_power:
             h_a = calc_hp(power_a, x_dist, h)
             h_b = calc_hp(power_b, y_dist, h)
