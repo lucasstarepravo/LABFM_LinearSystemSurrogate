@@ -32,8 +32,7 @@ def calc_scaling_vector(monomial_exponent, h):
     return scaling_m
 
 
-def calc_monomial(neigh_xy_d, polynomial, mon_power):
-    neigh_xy_d = neigh_xy_d
+def calc_monomial(neigh_xy_d, mon_power):
     monomial = []
     for index, (x_dist, y_dist) in enumerate(neigh_xy_d):
         row = []
