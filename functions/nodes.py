@@ -15,7 +15,7 @@ def calc_h(s, polynomial):
     :return:
     """
     if polynomial == 2:
-        h = 1.4 * s
+        h = 1.5 * s
     elif polynomial == 4:
         h = 1.9 * s
     elif polynomial == 6:
@@ -76,8 +76,8 @@ def neighbour_nodes(coordinates, ref_node, h, max_neighbors=None):
     sorted_combined_list = sorted(combined_list, key=lambda x: x[0])
 
     # If max_neighbors is specified and less than the number of found neighbors, slice the lists
-    if max_neighbors is not None and max_neighbors < len(sorted_combined_list):
-        sorted_combined_list = sorted_combined_list[:max_neighbors]
+    #if max_neighbors is not None and max_neighbors < len(sorted_combined_list):
+    #    sorted_combined_list = sorted_combined_list[:max_neighbors]
 
     # Unzip the potentially sliced list into individual lists
     neigh_r_d, neigh_xy_d, neigh_coor = zip(*sorted_combined_list) if sorted_combined_list else ([], [], [])
