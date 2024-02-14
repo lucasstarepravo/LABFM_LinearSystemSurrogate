@@ -10,7 +10,7 @@ class Simulation:
         self.s             = 1.0 / (total_nodes - 1)
         self.h             = calc_h(self.s, polynomial)
         self.coordinates   = create_nodes(total_nodes, self.s, polynomial)
-        self.weights       = Weights(self.coordinates, polynomial, self.h, total_nodes)
+        self.weights       = Weights(self.coordinates, polynomial, self.h, total_nodes, self.s)
         self.test_function = TestFunction(self.coordinates, self.weights)
         self.dtdx_l2       = calc_l2(self.test_function, 'dtdx')
         self.dtdy_l2       = calc_l2(self.test_function, 'dtdy')
