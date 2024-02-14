@@ -70,7 +70,7 @@ def wendland_rbf_c6(neighbours_r, h):
 
 def wendland_rbf_c2(neighbours_r, h):
     q = neighbours_r/h
-    w_ji = ((7/(4 * math.pi)) * (2 * q + 1) * 4 * (1 - q/2))
+    w_ji = ((7/(4 * math.pi)) * (2 * q + 1) * (1 - .5*q)**4)
     return float(w_ji)
 
 
@@ -138,7 +138,7 @@ def calc_abf(neigh_r, neigh_xy, m_power, h):  # Needs to be written
 
     for index, (x_dist, y_dist) in enumerate(neigh_xy):
         row = []
-        rbf = wendland_rbf_c6(neigh_r[index], h)
+        rbf = wendland_rbf_c2(neigh_r[index], h)
         for power_a, power_b in m_power:
             h_a = calc_hp(power_a, x_dist, h)
             h_b = calc_hp(power_b, y_dist, h)
@@ -213,7 +213,7 @@ def calc_weights(coordinates, polynomial, h, total_nodes):
             continue
         else:
             ref_node            = (ref_x, ref_y)
-            neigh_r_d, neigh_xy_d, neigh_coor_dict[ref_node] = neighbour_nodes(coordinates, ref_node, h, max_neighbors=None)
+            neigh_r_d, neigh_xy_d, neigh_coor_dict[ref_node] = neighbour_nodes(coordinates, ref_node, h, max_neighbors=20)
             monomial            = calc_monomial(neigh_xy_d, monomial_exponent) * scaling_vector
             basis_func          = calc_abf(neigh_r_d, neigh_xy_d, monomial_exponent, h)
             m_matrix            = calc_m(basis_func, monomial)
