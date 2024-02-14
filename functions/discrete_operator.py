@@ -2,6 +2,7 @@ import numpy as np
 import math
 from functions.nodes import neighbour_nodes
 from tqdm import tqdm
+from shapefunc_surrogate.dd_model import ann_predict
 
 
 def monomial_power(polynomial):
@@ -185,7 +186,7 @@ def pointing_v(polynomial, d):
     return cd
 
 
-def calc_weights(coordinates, polynomial, h, total_nodes):
+def calc_weights(coordinates, polynomial, h, total_nodes, s):
     """
 
     :param coordinates:
@@ -214,19 +215,21 @@ def calc_weights(coordinates, polynomial, h, total_nodes):
         else:
             ref_node            = (ref_x, ref_y)
             neigh_r_d, neigh_xy_d, neigh_coor_dict[ref_node] = neighbour_nodes(coordinates, ref_node, h, max_neighbors=20)
-            monomial            = calc_monomial(neigh_xy_d, monomial_exponent) * scaling_vector
-            basis_func          = calc_abf(neigh_r_d, neigh_xy_d, monomial_exponent, h)
-            m_matrix            = calc_m(basis_func, monomial)
-            psi_x               = np.linalg.solve(m_matrix, cd_x)
-            psi_y               = np.linalg.solve(m_matrix, cd_y)
-            psi_laplace         = np.linalg.solve(m_matrix, cd_laplace)
-            node_weight_x       = basis_func @ psi_x
-            node_weight_y       = basis_func @ psi_y
-            node_weight_laplace = basis_func @ psi_laplace
-            weights_x[ref_node] = node_weight_x
-            weights_y[ref_node] = node_weight_y
-            weights_laplace[ref_node] = node_weight_laplace
-
+            weights_laplace[ref_node] = ann_predict(neigh_xy_d, neigh_coor_dict[ref_node], h, dtype='laplace')
+            #monomial            = calc_monomial(neigh_xy_d, monomial_exponent) * scaling_vector
+            #basis_func          = calc_abf(neigh_r_d, neigh_xy_d, monomial_exponent, h)
+            #m_matrix            = calc_m(basis_func, monomial)
+            #psi_x               = np.linalg.solve(m_matrix, cd_x)
+            #psi_y               = np.linalg.solve(m_matrix, cd_y)
+            #psi_laplace         = np.linalg.solve(m_matrix, cd_laplace)
+            #node_weight_x       = basis_func @ psi_x
+            #node_weight_y       = basis_func @ psi_y
+            #node_weight_laplace = basis_func @ psi_laplace
+            #weights_x[ref_node] = node_weight_x
+            #weights_y[ref_node] = node_weight_y
+            #weights_laplace[ref_node] = node_weight_laplace
+    '''remove outputs from x and y derivatives and also in the objects of where they are called, or just
+    substitute all for the laplace values for now, x and y weights are just laplace for now'''
     return weights_x, weights_y, weights_laplace, neigh_coor_dict
 
 
