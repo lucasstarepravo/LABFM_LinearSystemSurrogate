@@ -1,7 +1,7 @@
-from keras.models import load_model
 from shapefunc_surrogate.preprocessing import *
 from shapefunc_surrogate.postprocessing import *
 import pickle as pk
+
 
 
 class Standardisation:
@@ -20,21 +20,12 @@ class Standardisation:
         self.h_scale_w = h_scale_w
 
 
-def ann_predict(neigh_xy_d, neigh_coor, dx, dtype='laplace'):
+def ann_predict(model, neigh_xy_d, neigh_coor, h, s, dtype='laplace'):
 
-    with open('/home/combustion/python/pythonProject/stand_info.pk', 'rb') as f:
-        stand_info = pk.load(f) # This variable should contain the average of the trained weights, the standard dev
-                                # that will be used to rescale the weights and the standard dev that will be used to
-                                # rescale the input x and y distances
-
-    #h_scale_xy = stand_info.h_scale_xy
-    h_scale_w = stand_info.h_scale_w
-    l_mean = stand_info.l_mean
-
-    stand_feature, f_mean = non_dimension(neigh_xy_d, dx)
-    stand_feature = stand_feature.reshape(-1, 1)
-
-
-    weights =  1
-
-    return weights
+    neigh_xy_d = neigh_xy_d[1:, :]
+    stand_feature, f_mean = non_dimension(neigh_xy_d, h)
+    stand_feature = np.reshape(stand_feature, (1, -1))
+    predicted_w = model.predict(stand_feature)
+    scaled_w = rescale_output(predicted_w, neigh_xy_d, h)
+    scaled_w = np.insert(scaled_w, 0, 0, axis=1)
+    return scaled_w
