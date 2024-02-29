@@ -1,10 +1,8 @@
 import numpy as np
 
 
-def non_dimension(features, dx):
-    dx = 1.5 * dx # The scaling factor for s needs to be consistent for the value used in fortran
-
+def non_dimension(features, h):
     f_mean = np.mean(features, axis=0, keepdims=True)
-    stand_feature = (features - f_mean) / dx
+    stand_feature = (features - f_mean) / h
 
     return stand_feature, f_mean
