@@ -3,6 +3,7 @@ import math
 from functions.nodes import neighbour_nodes
 from tqdm import tqdm
 from shapefunc_surrogate.dd_model import ann_predict
+from keras.models import load_model
 
 
 def monomial_power(polynomial):
@@ -209,13 +210,18 @@ def calc_weights(coordinates, polynomial, h, total_nodes, s):
     cd_laplace = pointing_v(polynomial, 'Laplace')
     cd_laplace = cd_laplace * scaling_vector
 
+    model = load_model('/home/combustion/Desktop/PhD/Shape Function Surrogate/Order_4/Noise_0.3/Models/ann22.keras')
+
     for ref_x, ref_y in tqdm(coordinates, desc="Calculating Weights for " + str(total_nodes) + ", " + str(polynomial), ncols=100):
         if ref_x > 1 or ref_x < 0 or ref_y > 1 or ref_y < 0:
             continue
         else:
             ref_node            = (ref_x, ref_y)
             neigh_r_d, neigh_xy_d, neigh_coor_dict[ref_node] = neighbour_nodes(coordinates, ref_node, h, max_neighbors=20)
-            weights_laplace[ref_node] = ann_predict(neigh_xy_d, neigh_coor_dict[ref_node], h, dtype='laplace')
+            weights_laplace[ref_node] = ann_predict(model, neigh_xy_d, neigh_coor_dict[ref_node], h, s, dtype='laplace')
+            weights_x[ref_node] = weights_laplace[ref_node] # For now leaving x and y derivatives the same as the laplace
+            weights_y[ref_node] = weights_laplace[ref_node]
+
             #monomial            = calc_monomial(neigh_xy_d, monomial_exponent) * scaling_vector
             #basis_func          = calc_abf(neigh_r_d, neigh_xy_d, monomial_exponent, h)
             #m_matrix            = calc_m(basis_func, monomial)
