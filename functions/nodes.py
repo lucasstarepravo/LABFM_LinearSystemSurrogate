@@ -4,7 +4,7 @@ import random
 
 def random_matrix(seed, shape, s):
     random.seed(seed)
-    return np.array([[random.uniform(-s/4, s/4) for _ in range(shape[1])] for _ in range(shape[0])])
+    return np.array([[random.uniform(-s/10, s/10) for _ in range(shape[1])] for _ in range(shape[0])])
 
 
 def calc_h(s, polynomial):
