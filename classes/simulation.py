@@ -19,7 +19,7 @@ class Simulation:
     def plot_neighbours(self, size=8):
         return show_neighbours(self.coordinates, self.weights, size)
 
-    def plot_weights(self, size=80, derivative='dtdx'):
+    def plot_weights(self, size=80, derivative='Laplace'):
         return plot_weights(self.coordinates, self.weights, size, derivative)
 
 
