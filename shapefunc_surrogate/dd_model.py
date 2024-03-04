@@ -1,31 +1,36 @@
+import numpy as np
+
 from shapefunc_surrogate.preprocessing import *
 from shapefunc_surrogate.postprocessing import *
 import pickle as pk
 
 
+def ann_predict(model, neigh_xy_dict, neigh_coor, h, s, dtype='laplace'):
 
-class Standardisation:
-    def __init__(self, l_mean = None, h_scale_xy = None, h_scale_w = None):
-        self.l_mean = l_mean
-        self.h_scale_xy = h_scale_xy
-        self.h_scale_w = h_scale_w
+    ref_nodes = []
+    distances = []
 
-    def set_l_mean(self, l_mean):
-        self.l_mean = l_mean
+    for key in neigh_xy_dict:
+        ref_nodes.append(key)
+        distances.append(neigh_xy_dict[key])
 
-    def set_h_scale_xy(self, h_scale_xy):
-        self.h_scale_xy = h_scale_xy
+    distances_array = np.array(distances)
+    distances_array = distances_array[:, 1:, :]
 
-    def set_h_scale_w(self, h_scale_w):
-        self.h_scale_w = h_scale_w
+    stand_feature, f_mean, f_std = stdv_normalisation(distances_array)
+    stand_feature = stand_feature.reshape(stand_feature.shape[0], -1)
 
-
-def ann_predict(model, neigh_xy_d, neigh_coor, h, s, dtype='laplace'):
-
-    neigh_xy_d = neigh_xy_d[1:, :]
-    stand_feature, f_mean = non_dimension(neigh_xy_d, h)
-    stand_feature = np.reshape(stand_feature, (1, -1))
     predicted_w = model.predict(stand_feature)
-    scaled_w = rescale_output(predicted_w, neigh_xy_d, h)
+    scaled_w = rescale_output_stdv(predicted_w, f_std, dtype=dtype)
+
     scaled_w = np.insert(scaled_w, 0, 0, axis=1)
-    return scaled_w
+    scaled_w = scaled_w.T
+
+    scaled_w_dict = {}
+    loop = 0
+
+    for ref_node_coor in ref_nodes:
+        scaled_w_dict[ref_node_coor] = scaled_w[:, loop]
+        loop = loop + 1
+
+    return scaled_w_dict
