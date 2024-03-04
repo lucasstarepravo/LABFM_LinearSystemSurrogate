@@ -1,8 +1,36 @@
 import numpy as np
-
 from shapefunc_surrogate.preprocessing import *
 from shapefunc_surrogate.postprocessing import *
 import pickle as pk
+
+
+def monomial_power(polynomial):
+    """
+
+    :param polynomial:
+    :return:
+    """
+    monomial_exponent = [(total_polynomial - i, i)
+                         for total_polynomial in range(1, polynomial + 1)
+                         for i in range(total_polynomial + 1)]
+    return np.array(monomial_exponent)
+
+
+def calc_moments(neigh_xy_d, scaled_w, polynomial):
+    mon_power = monomial_power(polynomial)
+    monomial = []
+    for power_x, power_y in mon_power:
+        monomial.append((neigh_xy_d[:, :, 0] ** power_x * neigh_xy_d[:, :, 1] ** power_y) /
+                        (math.factorial(power_x) * math.factorial(power_y)))
+    moments = np.array(monomial) * scaled_w
+    moments = np.sum(moments, axis=2)
+    return moments.T
+
+
+def moments_normalised(stand_feature, predicted_w):
+    stand_feature1 = stand_feature.reshape(stand_feature.shape[0], -1, 2)
+    moments = calc_moments(stand_feature1, predicted_w, polynomial=2)
+    return moments
 
 
 def ann_predict(model, neigh_xy_dict, neigh_coor, h, s, dtype='laplace'):
