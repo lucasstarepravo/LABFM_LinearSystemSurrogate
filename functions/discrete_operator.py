@@ -209,7 +209,7 @@ def calc_weights(coordinates, polynomial, h, total_nodes, s):
     #cd_laplace = pointing_v(polynomial, 'Laplace')
     #cd_laplace = cd_laplace * scaling_vector
 
-    model = load_model('/home/combustion/Desktop/PhD/Shape Function Surrogate/Order_2/Noise_0.25/Models/ann23.keras')
+    model = load_model('/home/combustion/Desktop/PhD/Shape Function Surrogate/Order_2/mixed/Models/ann24.keras')
 
     for ref_x, ref_y in tqdm(coordinates, desc="Calculating Weights for " + str(total_nodes) + ", " + str(polynomial), ncols=100):
         if ref_x > 1 or ref_x < 0 or ref_y > 1 or ref_y < 0:
