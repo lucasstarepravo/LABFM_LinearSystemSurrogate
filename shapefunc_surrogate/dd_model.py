@@ -45,7 +45,7 @@ def ann_predict(model, neigh_xy_dict, neigh_coor, h, s, dtype='laplace'):
     distances_array = np.array(distances)
     distances_array = distances_array[:, 1:, :]
 
-    stand_feature, f_mean, f_std = stdv_normalisation(distances_array)
+    stand_feature, f_std = spread_norm(distances_array)
     stand_feature = stand_feature.reshape(stand_feature.shape[0], -1)
 
     predicted_w = model.predict(stand_feature)
