@@ -1,8 +1,8 @@
 import numpy as np
 import math
-from functions.nodes import neighbour_nodes
+from LABFM.functions.nodes import neighbour_nodes
 from tqdm import tqdm
-from shapefunc_surrogate.dd_model import ann_predict
+from LABFM.shapefunc_surrogate.dd_model import ann_predict
 from keras.models import load_model
 
 

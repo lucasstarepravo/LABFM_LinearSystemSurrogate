@@ -1,6 +1,6 @@
 import numpy as np
-from shapefunc_surrogate.preprocessing import *
-from shapefunc_surrogate.postprocessing import *
+from LABFM.shapefunc_surrogate.preprocessing import *
+from LABFM.shapefunc_surrogate.postprocessing import *
 import pickle as pk
 
 

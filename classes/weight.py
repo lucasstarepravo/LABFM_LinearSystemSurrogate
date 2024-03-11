@@ -1,4 +1,4 @@
-from functions.discrete_operator import calc_weights
+from LABFM.functions.discrete_operator import calc_weights
 
 
 class Weights:
