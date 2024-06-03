@@ -1,4 +1,4 @@
-from LABFM.functions.test_function import test_function, dif_analytical, laplace_phi, dif_do
+from functions.test_function import test_function, dif_analytical, laplace_phi, dif_do
 
 
 class TestFunction:

@@ -1,9 +1,11 @@
 import numpy as np
 import math
-from LABFM.functions.nodes import neighbour_nodes
+from functions.nodes import neighbour_nodes_kdtree
+from scipy.spatial import cKDTree
 from tqdm import tqdm
-from LABFM.shapefunc_surrogate.dd_model import ann_predict
-from keras.models import load_model
+from shapefunc_surrogate.dd_model import ann_predict
+from shapefunc_surrogate.SaveNLoad import load_attrs, load_model_instance
+
 
 
 def monomial_power(polynomial):
@@ -196,51 +198,58 @@ def calc_weights(coordinates, polynomial, h, total_nodes, s):
     :return:
     """
 
-    neigh_xy_dict = {}
-    neigh_r_dict = {}
     neigh_coor_dict = {}
+    basis_func_dict = {}
+    m_matrix_dict = {}
 
-    #monomial_exponent = monomial_power(polynomial)
-    #scaling_vector = calc_scaling_vector(monomial_exponent, h)
+    monomial_exponent = monomial_power(polynomial)
+    scaling_vector = calc_scaling_vector(monomial_exponent, h)
     #cd_x = pointing_v(polynomial, 'x')
     #cd_x = cd_x * scaling_vector
     #cd_y = pointing_v(polynomial, 'y')
     #cd_y = cd_y * scaling_vector
     #cd_laplace = pointing_v(polynomial, 'Laplace')
     #cd_laplace = cd_laplace * scaling_vector
+    tree = cKDTree(coordinates)
 
-    model = load_model('/home/combustion/Desktop/PhD/Shape Function Surrogate/Order_2/mixed/Models/ann24.keras')
+
+    # Here the file path should be the exact path to the file and should contain the file in the end of the directory
+    # Notice that the file path to model and attrs will contain different files in the end of the directory
+    attrs = load_attrs('/home/combustion/Desktop/PhD/Shape Function Surrogate/Order_2/Noise_0.3/Models/attrs28.pk')
+    model = load_model_instance('/home/combustion/Desktop/PhD/Shape Function Surrogate/Order_2/Noise_0.3/Models/ann28.pth', attrs)
 
     for ref_x, ref_y in tqdm(coordinates, desc="Calculating Weights for " + str(total_nodes) + ", " + str(polynomial), ncols=100):
         if ref_x > 1 or ref_x < 0 or ref_y > 1 or ref_y < 0:
             continue
         else:
-            ref_node            = (ref_x, ref_y)
-            neigh_r_dict[ref_node], neigh_xy_dict[ref_node], neigh_coor_dict[ref_node] = neighbour_nodes(coordinates, ref_node, h, max_neighbors=20)
+            ref_node          = (ref_x, ref_y)
+            neigh_r_d, neigh_xy_d, neigh_coor_dict[ref_node] = neighbour_nodes_kdtree(coordinates, ref_node, h, tree, max_neighbors=None)
+            monomial            = calc_monomial(neigh_xy_d, monomial_exponent) * scaling_vector
+            basis_func_dict[ref_node]         = calc_abf(neigh_r_d, neigh_xy_d, monomial_exponent, h)
+            m_matrix_dict[ref_node]            = calc_m(basis_func_dict[ref_node], monomial)
 
+    psi_laplace, total_time = ann_predict(model, m_matrix_dict, h, dtype='laplace')
+    print('total time:')
+    print(total_time)
+    psi_y = psi_laplace
+    psi_x = psi_laplace
 
-    weights_laplace1 = ann_predict(model, neigh_xy_dict, neigh_coor_dict, h, s, dtype='laplace')
+    weights_x = {}
+    weights_y = {}
+    weights_laplace = {}
 
-    weights_x = weights_laplace1 # For now leaving x and y derivatives the same as the laplace
-    weights_y = weights_laplace1
+    for ref_node in basis_func_dict:
+            node_weight_x       = basis_func_dict[ref_node] @ psi_x[ref_node]
+            node_weight_y       = basis_func_dict[ref_node] @ psi_y[ref_node]
+            node_weight_laplace = basis_func_dict[ref_node] @ psi_laplace[ref_node]
+            weights_x[ref_node] = node_weight_x
+            weights_y[ref_node] = node_weight_y
+            weights_laplace[ref_node] = node_weight_laplace
 
-
-            #monomial            = calc_monomial(neigh_xy_d, monomial_exponent) * scaling_vector
-            #basis_func          = calc_abf(neigh_r_d, neigh_xy_d, monomial_exponent, h)
-            #m_matrix            = calc_m(basis_func, monomial)
-            #psi_x               = np.linalg.solve(m_matrix, cd_x)
-            #psi_y               = np.linalg.solve(m_matrix, cd_y)
-            #psi_laplace         = np.linalg.solve(m_matrix, cd_laplace)
-            #node_weight_x       = basis_func @ psi_x
-            #node_weight_y       = basis_func @ psi_y
-            #node_weight_laplace = basis_func @ psi_laplace
-            #weights_x[ref_node] = node_weight_x
-            #weights_y[ref_node] = node_weight_y
-            #weights_laplace[ref_node] = node_weight_laplace
     '''remove outputs from x and y derivatives and also in the objects of where they are called, or just
     substitute all for the laplace values for now, x and y weights are just laplace for now'''
 
-    return weights_x, weights_y, weights_laplace1, neigh_coor_dict
+    return weights_x, weights_y, weights_laplace, neigh_coor_dict
 
 
 def calc_l2(test_function, derivative):

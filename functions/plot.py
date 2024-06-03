@@ -272,3 +272,158 @@ def plot_convergence2(results, derivative='dtdx', size=20):
     set_log_ticks(plt.gca().yaxis)
 
     plt.show()
+
+
+
+def plot_convergence3(results, derivative='dtdx', size=20):
+
+    poly2 = {k: v for k, v in results.items() if k[1] == 2}
+    poly4 = {k: v for k, v in results.items() if k[1] == 4}
+    poly6 = {k: v for k, v in results.items() if k[1] == 6}
+    poly8 = {k: v for k, v in results.items() if k[1] == 8}
+
+    if derivative == 'dtdx':
+        # DTDX
+        dtdx2_l2 = []
+        s2 = []
+        for tup in list(poly2.keys()):
+            s2.append(1 / tup[0])
+            dtdx2_l2.append(poly2[tup].dtdx_l2)
+        s2 = np.array(s2)
+        dtdx2_l2 = np.array(dtdx2_l2)
+
+        dtdx4_l2 = []
+        s4 = []
+        for tup in list(poly4.keys()):
+            s4.append(1 / tup[0])
+            dtdx4_l2.append(poly4[tup].dtdx_l2)
+        s4 = np.array(s4)
+        dtdx4_l2 = np.array(dtdx4_l2)
+
+        dtdx6_l2 = []
+        s6 = []
+        for tup in list(poly6.keys()):
+            s6.append(1 / tup[0])
+            dtdx6_l2.append(poly6[tup].dtdx_l2)
+        s6 = np.array(s6)
+        dtdx6_l2 = np.array(dtdx6_l2)
+
+        dtdx8_l2 = []
+        s8 = []
+        for tup in list(poly8.keys()):
+            s8.append(1 / tup[0])
+            dtdx8_l2.append(poly8[tup].dtdx_l2)
+        s8 = np.array(s8)
+        dtdx8_l2 = np.array(dtdx8_l2)
+
+    elif derivative == 'dtdy':
+        # DTDY
+        dtdx2_l2 = []
+        s2 = []
+        for tup in list(poly2.keys()):
+            s2.append(1 / tup[0])
+            dtdx2_l2.append(poly2[tup].dtdy_l2)
+        s2 = np.array(s2)
+        dtdx2_l2 = np.array(dtdx2_l2)
+
+        dtdx4_l2 = []
+        s4 = []
+        for tup in list(poly4.keys()):
+            s4.append(1 / tup[0])
+            dtdx4_l2.append(poly4[tup].dtdy_l2)
+        s4 = np.array(s4)
+        dtdx4_l2 = np.array(dtdx4_l2)
+
+        dtdx6_l2 = []
+        s6 = []
+        for tup in list(poly6.keys()):
+            s6.append(1 / tup[0])
+            dtdx6_l2.append(poly6[tup].dtdy_l2)
+        s6 = np.array(s6)
+        dtdx6_l2 = np.array(dtdx6_l2)
+
+        dtdx8_l2 = []
+        s8 = []
+        for tup in list(poly8.keys()):
+            s8.append(1 / tup[0])
+            dtdx8_l2.append(poly8[tup].dtdy_l2)
+        s8 = np.array(s8)
+        dtdx8_l2 = np.array(dtdx8_l2)
+    elif derivative == 'Laplace':
+        # LAPLACE
+        dtdx2_l2 = []
+        s2 = []
+        for tup in list(poly2.keys()):
+            s2.append(1 / tup[0])
+            dtdx2_l2.append(poly2[tup].laplace_l2)
+        s2 = np.array(s2)
+        dtdx2_l2 = np.array(dtdx2_l2)
+
+        dtdx4_l2 = []
+        s4 = []
+        for tup in list(poly4.keys()):
+            s4.append(1 / tup[0])
+            dtdx4_l2.append(poly4[tup].laplace_l2)
+        s4 = np.array(s4)
+        dtdx4_l2 = np.array(dtdx4_l2)
+
+        dtdx6_l2 = []
+        s6 = []
+        for tup in list(poly6.keys()):
+            s6.append(1 / tup[0])
+            dtdx6_l2.append(poly6[tup].laplace_l2)
+        s6 = np.array(s6)
+        dtdx6_l2 = np.array(dtdx6_l2)
+
+        dtdx8_l2 = []
+        s8 = []
+        for tup in list(poly8.keys()):
+            s8.append(1 / tup[0])
+            dtdx8_l2.append(poly8[tup].laplace_l2)
+        s8 = np.array(s8)
+        dtdx8_l2 = np.array(dtdx8_l2)
+    else:
+        raise ValueError("Invalid derivative type")
+
+    s2, s4, s6, s8 = [np.array(data).flatten() for data in [s2, s4, s6, s8]]
+    dtdx2_l2, dtdx4_l2, dtdx6_l2, dtdx8_l2 = [np.array(data).flatten() for data in
+                                              [dtdx2_l2, dtdx4_l2, dtdx6_l2, dtdx8_l2]]
+
+
+    # Creating the scatter plot and lines connecting the points
+    plt.scatter(s2, dtdx2_l2, c='blue', label='Polynomial = 2', s=size)
+    plt.plot(s2, dtdx2_l2, c='blue')  # Line connecting points for Polynomial = 2
+
+    plt.scatter(s4, dtdx4_l2, c='red', label='Polynomial = 4', s=size)
+    plt.plot(s4, dtdx4_l2, c='red')  # Line connecting points for Polynomial = 4
+
+    plt.scatter(s6, dtdx6_l2, c='green', label='Polynomial = 6', s=size)
+    plt.plot(s6, dtdx6_l2, c='green')  # Line connecting points for Polynomial = 6
+
+    plt.scatter(s8, dtdx8_l2, c='black', label='Polynomial = 8', s=size)
+    plt.plot(s8, dtdx8_l2, c='black')  # Line connecting points for Polynomial = 8
+
+    # Labels, title, legend, grid
+    plt.xlabel('s/H')
+    plt.ylabel('L2 norm')
+    plt.title('Convergence of ' + derivative)
+    plt.legend()
+    plt.minorticks_on()  # Enable minor ticks
+    plt.grid(True, which='major', linestyle='-', linewidth='0.5', color='black')  # Major grid
+    plt.grid(True, which='minor', linestyle=':', linewidth='0.5', color='gray')  # Minor grid (subgrid)
+
+    # Log scale for x and y axes
+    plt.xscale('log')
+
+
+    # Setting x and y axis ticks to show every 10th base
+    def set_log_ticks(axis):
+        locator = plt.LogLocator(base=10.0, numticks=12)
+        axis.set_major_locator(locator)
+        axis.set_minor_locator(locator)
+
+    set_log_ticks(plt.gca().xaxis)
+
+    # Display the plot
+    plt.show()
+    return

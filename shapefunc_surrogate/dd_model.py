@@ -1,8 +1,10 @@
 import numpy as np
-from LABFM.shapefunc_surrogate.preprocessing import *
-from LABFM.shapefunc_surrogate.postprocessing import *
+from shapefunc_surrogate.preprocessing import *
+from shapefunc_surrogate.postprocessing import *
+import math
+import torch
 import pickle as pk
-
+import time
 
 def monomial_power(polynomial):
     """
@@ -33,32 +35,33 @@ def moments_normalised(stand_feature, predicted_w):
     return moments
 
 
-def ann_predict(model, neigh_xy_dict, neigh_coor, h, s, dtype='laplace'):
-
+def ann_predict(model, m_matrix_dict, h, dtype='laplace'):
+    total_laplace_time = 0
     ref_nodes = []
-    distances = []
-
-    for key in neigh_xy_dict:
+    m_matrices = []
+    start_time = time.time()
+    for key in m_matrix_dict:
         ref_nodes.append(key)
-        distances.append(neigh_xy_dict[key])
+        m_matrices.append(m_matrix_dict[key])
 
-    distances_array = np.array(distances)
-    distances_array = distances_array[:, 1:, :]
+    m_matrices = np.array(m_matrices)
+    m_matrices = torch.tensor(m_matrices, dtype=torch.float32)
+    m_matrices = m_matrices.reshape(m_matrices.shape[0], -1)
 
-    stand_feature, f_std = spread_norm(distances_array)
-    stand_feature = stand_feature.reshape(stand_feature.shape[0], -1)
+    # For higher orders of polynomials, the preprocessing of features will be in this line
 
-    predicted_w = model.predict(stand_feature)
-    scaled_w = rescale_output_stdv(predicted_w, f_std, dtype=dtype)
+    pred_psi = model.predict(m_matrices)
+    scaled_psi = rescale_output(pred_psi, h, dtype=dtype)
+    scaled_psi = scaled_psi.t()
+    scaled_psi = scaled_psi.detach().numpy()
 
-    scaled_w = np.insert(scaled_w, 0, 0, axis=1)
-    scaled_w = scaled_w.T
-
-    scaled_w_dict = {}
+    scaled_psi_dict = {}
     loop = 0
 
     for ref_node_coor in ref_nodes:
-        scaled_w_dict[ref_node_coor] = scaled_w[:, loop]
+        scaled_psi_dict[ref_node_coor] = scaled_psi[:, loop]
         loop = loop + 1
 
-    return scaled_w_dict
+    end_time = time.time()
+    total_laplace_time += (end_time - start_time)
+    return scaled_psi_dict, total_laplace_time

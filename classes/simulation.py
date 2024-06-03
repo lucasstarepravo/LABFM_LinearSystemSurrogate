@@ -1,8 +1,8 @@
-from LABFM.classes.weight import Weights
-from LABFM.classes.test_function import TestFunction
-from LABFM.functions.discrete_operator import calc_l2
-from LABFM.functions.nodes import create_nodes, calc_h
-from LABFM.functions.plot import plot_weights, show_neighbours
+from classes.weight import Weights
+from classes.test_function import TestFunction
+from functions.discrete_operator import calc_l2
+from functions.nodes import create_nodes, calc_h
+from functions.plot import plot_weights, show_neighbours
 
 
 class Simulation:
